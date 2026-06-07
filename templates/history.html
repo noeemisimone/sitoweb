@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Overview · Il tuo viaggio{% endblock %}
+
+{% block content %}
+<p class="ov-eyebrow">La tua cronologia</p>
+<h1>Il tuo viaggio</h1>
+<p class="muted">{{ total_searches }} {{ 'immagine esplorata' if total_searches == 1 else 'immagini esplorate' }} finora</p>
+
+{% if not searches %}
+    <p class="muted" style="margin-top:1.5rem;">Non hai ancora esplorato nulla. <a href="/explore" style="color:var(--accent);">Inizia qui →</a></p>
+{% else %}
+    <ul style="list-style:none; margin-top:1.5rem; display:flex; flex-direction:column; gap:0.6rem;">
+        {% for search in searches %}
+            <li class="ov-card" style="padding:0.9rem 1.2rem; display:flex; justify-content:space-between; gap:1rem;">
+                <strong>{{ search.image_title }}</strong>
+                <span class="muted" style="white-space:nowrap;">{{ search.viewed_at.strftime('%d/%m/%Y · %H:%M') }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <form method="POST" action="{{ url_for('clear_history') }}" style="margin-top:1.5rem;"
+          onsubmit="return confirm('Cancellare tutta la cronologia?')">
+        <button type="submit" class="btn btn-danger">Pulisci cronologia</button>
+    </form>
+{% endif %}
+{% endblock %}

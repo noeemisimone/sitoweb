@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Overview · Profilo{% endblock %}
+
+{% block content %}
+{% if bg_url %}
+{# Full-page backdrop: the APOD of the user's birthday, covering the whole
+   viewport behind all the content. A dark veil over it keeps text readable.
+   Lives here (profile.html) only, so no other page is affected. z-index:-1
+   sits above the body's cosmic background but behind the in-flow content. #}
+<div class="profile-bg" aria-hidden="true"
+     style="position: fixed; inset: 0; z-index: -1;
+            background-image: linear-gradient(rgba(7, 9, 20, 0.80), rgba(7, 9, 20, 0.9)), url('{{ bg_url }}');
+            background-size: cover; background-position: center;"></div>
+{% endif %}
+
+<section class="profile">
+    <p class="ov-eyebrow">Il tuo account</p>
+    <h1>Profilo</h1>
+
+    {% if bg_url %}
+    <p class="muted" style="margin-top:-0.4rem; font-size:0.85rem;">
+        {% if is_real_birthday %}
+        Il cielo del giorno della tua nascita · {{ pretty_date }}
+        {% else %}
+        Il cielo del {{ pretty_date }} — il primo anno in cui la NASA lo ha fotografato
+        {% endif %}
+    </p>
+    {% endif %}
+
+    <div class="ov-card" style="margin-top:1rem;">
+        <div class="profile-row" style="display:flex; justify-content:space-between; padding:0.4rem 0;">
+            <span class="muted">Username</span>
+            <span>{{ user.username }}</span>
+        </div>
+        <div class="profile-row" style="display:flex; justify-content:space-between; padding:0.4rem 0;">
+            <span class="muted">Email</span>
+            <span>{{ user.email }}</span>
+        </div>
+        <div class="profile-row" style="display:flex; justify-content:space-between; padding:0.4rem 0;">
+            <span class="muted">Iscritta dal</span>
+            <span>{{ user.created_at.strftime('%d/%m/%Y') }}</span>
+        </div>
+    </div>
+
+    <h2>I tuoi numeri</h2>
+    <div class="ov-grid" style="grid-template-columns:repeat(3, 1fr);">
+        <div class="ov-card" style="text-align:center;">
+            <p style="font-size:2rem; font-weight:700;">{{ images_count }}</p>
+            <p class="muted" style="font-size:0.85rem;">Immagini salvate</p>
+        </div>
+        <div class="ov-card" style="text-align:center;">
+            <p style="font-size:2rem; font-weight:700;">{{ searches_count }}</p>
+            <p class="muted" style="font-size:0.85rem;">Immagini esplorate</p>
+        </div>
+        <div class="ov-card" style="text-align:center;">
+            <p style="font-size:1.1rem; font-weight:600; margin-top:0.4rem;">{{ most_viewed or 'nessuna' }}</p>
+            <p class="muted" style="font-size:0.85rem;">La più rivisitata</p>
+        </div>
+    </div>
+
+    <p style="margin-top:2rem; display:flex; gap:0.8rem; align-items:center; flex-wrap:wrap;">
+        <button type="button" class="btn" id="open-pw-modal">Cambia password</button>
+        <a href="/logout" class="logout-btn">Esci</a>
+    </p>
+</section>
+
+<!-- Pop-up: change password. Same modal pattern as the Atlas image pop-up. -->
+<div class="modal-overlay modal-centered" id="pw-modal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+        <button type="button" class="modal-close" id="pw-modal-close" aria-label="Chiudi">✕</button>
+        <h2 style="margin-top:0;">Cambia password</h2>
+
+        <form method="POST" action="{{ url_for('update_password') }}" style="margin-top:1rem;">
+            <div class="form-field">
+                <label for="current_password">Password attuale</label>
+                <input type="password" id="current_password" name="current_password"
+                       class="input-field" required>
+            </div>
+
+            <div class="form-field">
+                <label for="new_password">Nuova password</label>
+                <input type="password" id="new_password" name="new_password"
+                       class="input-field" minlength="6" required
+                       placeholder="Almeno 6 caratteri">
+            </div>
+
+            <div class="form-field">
+                <label for="confirm_password">Conferma nuova password</label>
+                <input type="password" id="confirm_password" name="confirm_password"
+                       class="input-field" required placeholder="Ripeti la nuova password">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top:0.4rem;">Aggiorna password</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var modal = document.getElementById('pw-modal');
+        var openBtn = document.getElementById('open-pw-modal');
+        var closeBtn = document.getElementById('pw-modal-close');
+
+        function openModal() { modal.classList.add('open'); }
+        function closeModal() { modal.classList.remove('open'); }
+
+        openBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+        // Click on the dark backdrop (but not inside the card) closes the pop-up.
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) closeModal();
+        });
+        // Esc closes it too.
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeModal();
+        });
+    })();
+</script>
+{% endblock %}

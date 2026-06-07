@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Overview · Il tuo atlante{% endblock %}
+
+{# Reusable saved-image card, so collections and the "no collection" section
+   share the exact same markup. #}
+{% macro image_card(img) %}
+<div class="ov-card atlas-card" style="padding:0; cursor:pointer; position:relative;"
+     data-id="{{ img.id }}"
+     data-title="{{ img.title }}"
+     data-date="{{ img.date }}"
+     data-image="{{ img.image_url }}"
+     data-explanation="{{ img.explanation }}"
+     data-nota="{{ img.nota or '' }}"
+     data-personal="{{ url_for('static', filename=img.personal_image_url) if img.personal_image_url else '' }}"
+     data-collection="{{ img.collection_id or '' }}">
+    {% if img.is_favorite %}
+        <div class="favorite-badge" aria-label="Immagine preferita"
+             style="position:absolute; top:0.6rem; left:0.6rem; z-index:2;
+                    background:rgba(3,4,10,0.7); border-radius:999px; padding:0.25rem 0.6rem;
+                    font-size:0.95rem; line-height:1; backdrop-filter:blur(4px);">⭐</div>
+    {% endif %}
+    {% if img.image_url %}
+        <img src="{{ img.image_url }}" alt="{{ img.title }}" class="ov-image" style="border-radius:16px 16px 0 0; border:none; aspect-ratio:4/3; object-fit:cover;">
+    {% endif %}
+    <div style="padding:1rem;">
+        <h3 style="font-size:1.05rem;">{{ img.title }}</h3>
+        <p class="muted" style="font-size:0.85rem;">{{ img.date }}{% if img.personal_image_url %} · con il tuo ricordo{% endif %}</p>
+        {% if img.nota %}<p class="ov-note">{{ img.nota }}</p>{% endif %}
+        <div style="margin-top:0.8rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <form method="POST" action="/set_favorite/{{ img.id }}" onclick="event.stopPropagation();">
+                <button type="submit" class="btn" style="padding:0.4rem 0.9rem; font-size:0.85rem;">
+                    {{ '★ Preferita' if img.is_favorite else '☆ Segna come preferita' }}
+                </button>
+            </form>
+            <form method="POST" action="/delete_image/{{ img.id }}" onclick="event.stopPropagation();">
+                <button type="submit" class="btn btn-danger" style="padding:0.4rem 0.9rem; font-size:0.85rem;">Rimuovi</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{% block content %}
+<p class="ov-eyebrow">La tua collezione</p>
+<h1 style="margin-bottom:0.6rem;">Il tuo atlante</h1>
+
+{% if not saved_images %}
+    <p class="muted">Il tuo atlante è ancora vuoto. Vai su <a href="/explore" style="color:var(--accent);">Esplora</a> e salva le tue prime immagini.</p>
+{% else %}
+    <p class="muted" style="margin-bottom:1.4rem;">Nel tuo atlante {{ "c'è" if saved_images | length == 1 else 'ci sono' }} {{ saved_images | length }} {{ 'immagine' if saved_images | length == 1 else 'immagini' }}{% if collections %} in {{ collections | length }} {{ 'collezione' if collections | length == 1 else 'collezioni' }}{% endif %}.</p>
+
+    {# Create a new themed collection #}
+    <form method="POST" action="{{ url_for('create_collection') }}" class="collection-create">
+        <input type="text" name="name" class="input-field" placeholder="Nome di una nuova collezione (es. Nebulose)" required style="max-width:280px;">
+        <input type="text" name="description" class="input-field" placeholder="Descrizione (opzionale)" style="max-width:320px;">
+        <button type="submit" class="btn">+ Crea collezione</button>
+    </form>
+
+    {# One section per collection #}
+    {% for collection in collections %}
+    <section style="margin-top:2.6rem;">
+        <div class="collection-head">
+            <div>
+                <h2 style="margin:0;">{{ collection.name }}</h2>
+                {% if collection.description %}<p class="muted" style="font-size:0.9rem;">{{ collection.description }}</p>{% endif %}
+            </div>
+            <form method="POST" action="{{ url_for('delete_collection', collection_id=collection.id) }}"
+                  onsubmit="return confirm('Eliminare la collezione «{{ collection.name }}»? Le immagini resteranno nel tuo atlante.');">
+                <button type="submit" class="btn btn-danger" style="padding:0.4rem 0.9rem; font-size:0.85rem;">Elimina collezione</button>
+            </form>
+        </div>
+        {% if collection.images %}
+        <div class="ov-grid">
+            {% for img in collection.images | sort(attribute='is_favorite', reverse=true) %}{{ image_card(img) }}{% endfor %}
+        </div>
+        {% else %}
+        <p class="muted" style="font-size:0.9rem;">Ancora nessuna immagine qui. Apri un'immagine e assegnala a questa collezione.</p>
+        {% endif %}
+    </section>
+    {% endfor %}
+
+    {# Images not assigned to any collection #}
+    <section style="margin-top:2.6rem;">
+        <h2>{{ 'Senza collezione' if collections else 'Tutte le immagini' }}</h2>
+        {% if uncategorized %}
+        <div class="ov-grid">
+            {% for img in uncategorized | sort(attribute='is_favorite', reverse=true) %}{{ image_card(img) }}{% endfor %}
+        </div>
+        {% else %}
+        <p class="muted" style="font-size:0.9rem;">Tutte le tue immagini sono organizzate in collezioni.</p>
+        {% endif %}
+    </section>
+{% endif %}
+
+<!-- Pop-up: reopen a saved image, edit its note, attach a photo, set its collection -->
+<div class="modal-overlay" id="img-modal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+        <button type="button" class="modal-close" id="modal-close" aria-label="Chiudi">✕</button>
+
+        <div class="modal-photos" id="modal-photos">
+            <figure class="modal-photo">
+                <img id="modal-img" src="" alt="" class="ov-image">
+                <figcaption>Universo · NASA</figcaption>
+            </figure>
+            <figure class="modal-photo" id="modal-personal-wrap" hidden>
+                <img id="modal-personal-img" src="" alt="Il tuo ricordo" class="ov-image">
+                <figcaption>Il tuo ricordo</figcaption>
+            </figure>
+        </div>
+
+        <h2 id="modal-title" style="margin-top:1rem;"></h2>
+        <p class="muted" id="modal-date"></p>
+
+        <form method="POST" id="modal-note-form" enctype="multipart/form-data" style="margin-top:1rem;">
+            <div class="form-field">
+                <label for="modal-note">La tua nota (perché ti colpisce)</label>
+                <textarea id="modal-note" name="nota" class="input-field" placeholder="Scrivi un pensiero su questa immagine…"></textarea>
+            </div>
+            <div class="form-field">
+                <label for="modal-collection">Collezione</label>
+                <select id="modal-collection" name="collection_id" class="input-field">
+                    <option value="">Nessuna collezione</option>
+                    {% for collection in collections %}
+                    <option value="{{ collection.id }}">{{ collection.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-field">
+                <label for="modal-personal-file" id="modal-personal-label">Allega una tua foto, un ricordo di quel giorno</label>
+                <input type="file" id="modal-personal-file" name="personal_image" accept="image/*" class="input-field">
+                <label class="modal-remove" id="modal-remove-wrap" hidden>
+                    <input type="checkbox" name="remove_personal" value="1">
+                    <span>Rimuovi il ricordo attuale</span>
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top:0.4rem;">Salva</button>
+        </form>
+
+        <p class="ov-explanation" id="modal-explanation"></p>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var modal = document.getElementById('img-modal');
+        var img = document.getElementById('modal-img');
+        var title = document.getElementById('modal-title');
+        var date = document.getElementById('modal-date');
+        var note = document.getElementById('modal-note');
+        var explanation = document.getElementById('modal-explanation');
+        var noteForm = document.getElementById('modal-note-form');
+        var photos = document.getElementById('modal-photos');
+        var personalWrap = document.getElementById('modal-personal-wrap');
+        var personalImg = document.getElementById('modal-personal-img');
+        var personalFile = document.getElementById('modal-personal-file');
+        var personalLabel = document.getElementById('modal-personal-label');
+        var removeWrap = document.getElementById('modal-remove-wrap');
+        var removeCheckbox = removeWrap.querySelector('input');
+        var collectionSelect = document.getElementById('modal-collection');
+
+        function openModal(card) {
+            img.src = card.dataset.image || '';
+            img.alt = card.dataset.title || '';
+            title.textContent = card.dataset.title || '';
+            date.textContent = card.dataset.date || '';
+            note.value = card.dataset.nota || '';
+            explanation.textContent = card.dataset.explanation || '';
+            noteForm.action = '/edit_note/' + card.dataset.id;
+            collectionSelect.value = card.dataset.collection || '';
+
+            // Personal photo: show it next to the universe shot if one exists.
+            var personal = card.dataset.personal || '';
+            personalFile.value = '';
+            removeCheckbox.checked = false;
+            if (personal) {
+                personalImg.src = personal;
+                personalWrap.hidden = false;
+                removeWrap.hidden = false;
+                photos.classList.add('has-personal');
+                personalLabel.textContent = 'Cambia la tua foto';
+            } else {
+                personalImg.src = '';
+                personalWrap.hidden = true;
+                removeWrap.hidden = true;
+                photos.classList.remove('has-personal');
+                personalLabel.textContent = 'Allega una tua foto, un ricordo di quel giorno';
+            }
+
+            modal.classList.add('open');
+        }
+
+        function closeModal() {
+            modal.classList.remove('open');
+        }
+
+        document.querySelectorAll('.atlas-card').forEach(function (card) {
+            card.addEventListener('click', function () { openModal(card); });
+        });
+
+        document.getElementById('modal-close').addEventListener('click', closeModal);
+        // Click on the dark backdrop (but not inside the card) closes the pop-up.
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) closeModal();
+        });
+        // Esc closes it too.
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeModal();
+        });
+    })();
+</script>
+{% endblock %}

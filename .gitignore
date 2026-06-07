@@ -1,0 +1,31 @@
+# Ambiente virtuale
+venv/
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# Database SQLite
+*.db
+instance/
+
+# Cache dell'app (traduzioni + APOD)
+cache/
+
+# Foto personali caricate dagli utenti
+static/uploads/
+
+# Variabili d'ambiente e segreti (il template .env.example invece va committato)
+.env
+!.env.example
+
+# Cache e report dei test
+.pytest_cache/
+.coverage
+
+# Cartelle degli editor / IDE
+.vscode/
+.idea/
+
+# File di sistema
+.DS_Store

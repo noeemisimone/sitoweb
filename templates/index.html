@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Overview · Stesso cielo. Nuovo sguardo.{% endblock %}
+
+{% block content %}
+<section style="text-align:center; padding:3rem 0;">
+    <p class="ov-eyebrow">Una foto dell'universo al giorno, dal 1995</p>
+    <h1 style="font-size:3rem; max-width:14ch; margin:0.8rem auto;">Stesso cielo.<br>Nuovo sguardo.</h1>
+    <p class="muted" style="max-width:54ch; margin:1rem auto 2rem; font-family:'Spectral',serif; font-size:1.1rem;">
+        Dal 16 giugno 1995 la NASA pubblica ogni giorno una foto dell'universo.
+        Con <strong style="color:var(--text);">Overview</strong> puoi esplorare quell'archivio
+        e salvare le immagini che ti colpiscono, costruendo a poco a poco il tuo atlante del cosmo.
+    </p>
+    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+        <a href="/today" class="btn btn-primary">Guarda il cielo di oggi</a>
+        <a href="/surprise" class="btn">Sorprendimi</a>
+        {% if not current_user %}
+            <a href="/register" class="btn btn-ghost">Crea il tuo atlante</a>
+        {% else %}
+            <a href="/atlas" class="btn btn-ghost">Apri il tuo atlante</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Overview{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+    <!-- Overview theme: dark, cosmic layer. Lives in its own stylesheet. -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="cosmic-loader" id="cosmicLoader" role="status" aria-label="Caricamento in corso">
+        <div class="loader-orbit">
+            <span class="loader-core"></span>
+            <span class="loader-planet"></span>
+        </div>
+        <p class="loader-text">In viaggio tra le galassie…</p>
+        <span class="loader-star" style="top:20%;left:25%"></span>
+        <span class="loader-star" style="top:30%;left:75%"></span>
+        <span class="loader-star" style="top:70%;left:20%"></span>
+        <span class="loader-star" style="top:65%;left:80%"></span>
+        <span class="loader-star" style="top:15%;left:55%"></span>
+    </div>
+
+    <nav class="navbar">
+        <div class="navbar-brand"><a href="/" style="text-decoration:none;">Overview</a></div>
+        <ul class="navbar-links">
+            {% if current_user %}
+                <li><a href="/atlas" class="{{ 'active' if request.path == '/atlas' }}">Atlante</a></li>
+                <li><a href="/explore" class="{{ 'active' if request.path == '/explore' }}">Esplora</a></li>
+                <li><a href="/history" class="{{ 'active' if request.path == '/history' }}">Cronologia</a></li>
+            {% endif %}
+            <li><a href="/today" class="{{ 'active' if request.path == '/today' }}">Oggi</a></li>
+            <li><a href="/surprise" class="{{ 'active' if request.path == '/surprise' }}">Sorprendimi</a></li>
+            {% if current_user %}
+                <li><a href="/profile" class="navbar-user {{ 'active' if request.path == '/profile' }}">{{ current_user.username }}</a></li>
+            {% else %}
+                <li><a href="/login" class="{{ 'active' if request.path == '/login' }}">Accedi</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert-list">
+                    {% for category, msg in messages %}
+                        <div class="alert alert-{{ category }}">{{ msg }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-brand">◉ Overview</div>
+            <div class="footer-tagline">Le foto dell'universo della NASA, dal 1995.</div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

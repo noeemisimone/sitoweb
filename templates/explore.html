@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Overview · Esplora{% endblock %}
+
+{% block content %}
+<section class="explore" style="max-width:720px; margin:0 auto; text-align:center;">
+    <p class="ov-eyebrow">Esplora l'archivio</p>
+    <h1 style="font-size:2.6rem; margin-top:0.4rem;">Scegli un giorno nel cosmo</h1>
+    <p class="muted" style="font-family:'Spectral',serif; font-size:1.15rem; margin:1.2rem auto 0; max-width:50ch;">
+        Dal 16 giugno 1995 la NASA pubblica una foto dell'universo ogni giorno.
+        Scegli una data e guarda cosa c'era nel cielo: prova anche con il giorno in cui sei nata. 🎂
+    </p>
+
+    <form method="POST" action="/explore" style="display:flex; gap:0.8rem; justify-content:center; align-items:flex-end; flex-wrap:wrap; margin:2.2rem 0 0.5rem;">
+        {{ form.hidden_tag() }}
+        <div class="form-field" style="margin-bottom:0; text-align:left;">
+            {{ form.date.label }}
+            {{ form.date(class="input-field", type="date", min="1995-06-16") }}
+            {% if form.date.errors %}
+                <ul class="form-errors">{% for e in form.date.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
+
+    <p class="muted" style="margin-top:2.6rem; text-transform:uppercase; letter-spacing:0.16em; font-size:0.74rem;">Oppure parti da una data memorabile</p>
+    <div class="ov-grid" style="grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:1rem; margin-top:1.1rem; text-align:left;">
+        <a href="/explore?date=1995-06-16" class="ov-card" style="text-decoration:none; padding:1.1rem;">
+            <p class="ov-eyebrow">16 giu 1995</p>
+            <p style="font-weight:600; margin-top:0.35rem;">La primissima foto</p>
+        </a>
+        <a href="/explore?date=2000-01-01" class="ov-card" style="text-decoration:none; padding:1.1rem;">
+            <p class="ov-eyebrow">1 gen 2000</p>
+            <p style="font-weight:600; margin-top:0.35rem;">Il primo giorno del millennio</p>
+        </a>
+        <a href="/explore?date=2019-07-20" class="ov-card" style="text-decoration:none; padding:1.1rem;">
+            <p class="ov-eyebrow">20 lug 2019</p>
+            <p style="font-weight:600; margin-top:0.35rem;">50 anni dalla Luna</p>
+        </a>
+        <a href="/explore?date=2020-12-21" class="ov-card" style="text-decoration:none; padding:1.1rem;">
+            <p class="ov-eyebrow">21 dic 2020</p>
+            <p style="font-weight:600; margin-top:0.35rem;">La grande congiunzione</p>
+        </a>
+    </div>
+</section>
+
+{% if image %}
+<article class="ov-card" style="margin-top:3rem;">
+    {% if image.image_url %}
+        <img src="{{ image.image_url }}" alt="{{ image.title }}" class="ov-image ov-image--hero">
+    {% endif %}
+    <h2 style="margin-top:1rem;">{{ image.title }}</h2>
+    <p class="muted">{{ image.pretty_date }}{% if image.copyright %} · © {{ image.copyright }}{% endif %}</p>
+
+    <form method="POST" action="{{ url_for('save_image') }}" enctype="multipart/form-data" style="margin-top:1rem;">
+        <input type="hidden" name="title" value="{{ image.title }}">
+        <input type="hidden" name="date" value="{{ image.date }}">
+        <input type="hidden" name="image_url" value="{{ image.image_url }}">
+        <input type="hidden" name="explanation" value="{{ image.explanation }}">
+        <div class="form-field">
+            <label for="nota">La tua nota (perché ti colpisce)</label>
+            <textarea id="nota" name="nota" class="input-field" placeholder="Scrivi un pensiero su questa immagine…"></textarea>
+        </div>
+        <div class="form-field">
+            <label for="explore-personal">Allega una tua foto, un ricordo di quel giorno (opzionale)</label>
+            <input type="file" id="explore-personal" name="personal_image" accept="image/*" class="input-field">
+        </div>
+        <button type="submit" class="btn btn-primary">♡ Aggiungi al mio atlante</button>
+    </form>
+
+    <p class="ov-explanation">{{ image.explanation }}</p>
+</article>
+{% endif %}
+{% endblock %}

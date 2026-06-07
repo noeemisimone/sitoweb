@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Overview · Accedi{% endblock %}
+
+{% block content %}
+<section class="auth">
+    <p class="ov-eyebrow">Bentornata</p>
+    <h1>Accedi</h1>
+
+    <form action="/login" method="POST" class="auth-form">
+        {{ form.hidden_tag() }}
+
+        <div class="form-field">
+            {{ form.username.label }}
+            {{ form.username(class="input-field", placeholder="Il tuo username") }}
+            {% if form.username.errors %}
+                <ul class="form-errors">
+                    {% for error in form.username.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="form-field">
+            {{ form.password.label }}
+            {{ form.password(class="input-field", placeholder="La tua password") }}
+            {% if form.password.errors %}
+                <ul class="form-errors">
+                    {% for error in form.password.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        {{ form.submit(class="auth-submit") }}
+    </form>
+
+    <p class="auth-link">
+        Non hai ancora un account? <a href="/register">Crea il tuo atlante</a>
+    </p>
+</section>
+{% endblock %}

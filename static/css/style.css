@@ -1,0 +1,420 @@
+/* Overview theme: a self-contained dark, cosmic layer. */
+
+:root {
+    --bg: #05060d;
+    --bg-soft: #0d1020;
+    --panel: rgba(255, 255, 255, 0.04);
+    --border: rgba(255, 255, 255, 0.10);
+    --text: #e8e9f3;
+    --muted: #9aa0bd;
+    --accent: #8ea2ff;
+    --accent-soft: rgba(142, 162, 255, 0.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: "Space Grotesk", -apple-system, sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(1200px 600px at 80% -10%, #1a1f3a 0%, transparent 60%),
+        radial-gradient(900px 500px at 0% 10%, #161a30 0%, transparent 55%),
+        var(--bg);
+    background-attachment: fixed;
+    min-height: 100vh;
+    line-height: 1.6;
+    /* Sticky-footer layout: page is a column, main grows, footer stays at the bottom. */
+    display: flex;
+    flex-direction: column;
+}
+
+a { color: inherit; }
+
+/* --- Navbar --- */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 2rem;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(10px);
+    background: rgba(5, 6, 13, 0.6);
+    z-index: 10;
+}
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.35rem;
+    letter-spacing: 0.06em;
+}
+.navbar-brand::before { content: "◉ "; color: var(--accent); }
+.navbar-links {
+    display: flex;
+    gap: 1.5rem;
+    list-style: none;
+    align-items: center;
+}
+.navbar-links a {
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+.navbar-links a:hover { color: var(--text); }
+/* Highlight the page you're currently on. */
+.navbar-links a.active { color: var(--text); }
+.navbar-links a.active:not(.navbar-user)::after {
+    content: "";
+    display: block;
+    height: 2px;
+    margin-top: 4px;
+    border-radius: 2px;
+    background: var(--accent);
+}
+.navbar-user {
+    color: var(--accent) !important;
+    border: 1px solid var(--border);
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+}
+.navbar-user.active { border-color: var(--accent); background: var(--accent-soft); }
+
+main { width: 100%; max-width: 1000px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; flex: 1 0 auto; }
+
+h1, h2, h3 { font-weight: 600; letter-spacing: -0.01em; }
+h1 { font-size: 2.4rem; margin-bottom: 0.5rem; }
+h2 { font-size: 1.5rem; margin: 2rem 0 1rem; }
+
+.muted { color: var(--muted); }
+
+/* --- Buttons --- */
+.btn, .auth-submit, .back-link, .logout-btn {
+    display: inline-block;
+    padding: 0.7rem 1.4rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--accent-soft);
+    color: var(--text);
+    text-decoration: none;
+    font: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.2s;
+}
+.btn:hover, .auth-submit:hover, .back-link:hover, .logout-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(142, 162, 255, 0.28);
+}
+.btn-primary { background: var(--accent); color: #06070f; border-color: var(--accent); font-weight: 600; }
+.btn-danger { background: rgba(255, 90, 110, 0.14); border-color: rgba(255, 90, 110, 0.4); color: #ffb3bf; }
+.btn-ghost { background: transparent; }
+
+/* --- Cards / panels --- */
+.ov-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    overflow: hidden;
+}
+.ov-image {
+    width: 100%;
+    border-radius: 14px;
+    display: block;
+    border: 1px solid var(--border);
+}
+/* Big "hero" images (Today / Surprise / Explore result / Atlas featured):
+   kept whole but capped in height so they never overwhelm the page. */
+.ov-image--hero {
+    width: auto;
+    max-width: 100%;
+    max-height: 60vh;
+    margin: 0 auto;
+    object-fit: contain;
+    background: var(--bg-soft);
+}
+.ov-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.25rem;
+}
+.ov-eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.72rem;
+    color: var(--accent);
+}
+.ov-explanation { color: var(--muted); margin-top: 1rem; font-family: "Spectral", serif; }
+.ov-note {
+    font-family: "Spectral", serif;
+    font-style: italic;
+    color: var(--text);
+    border-left: 2px solid var(--accent);
+    padding-left: 0.8rem;
+    margin-top: 0.6rem;
+}
+
+/* --- Collections (Atlas) --- */
+.collection-create {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+    padding: 1rem 1.2rem;
+    border: 1px dashed var(--border);
+    border-radius: 14px;
+    background: var(--panel);
+}
+.collection-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+select.input-field { cursor: pointer; }
+
+/* --- Forms --- */
+.form-field { margin-bottom: 1.1rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.form-field label { color: var(--muted); font-size: 0.9rem; }
+.input-field {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    color: var(--text);
+    font: inherit;
+}
+.input-field:focus { outline: none; border-color: var(--accent); }
+.form-errors { color: #ffb3bf; list-style: none; font-size: 0.85rem; }
+textarea.input-field { resize: vertical; min-height: 70px; }
+
+.auth, .profile { max-width: 460px; margin: 0 auto; }
+.auth-form { display: flex; flex-direction: column; }
+.auth-link { margin-top: 1.2rem; color: var(--muted); }
+.auth-link a { color: var(--accent); }
+
+/* --- Flash messages --- */
+.alert-list { margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.alert { padding: 0.8rem 1.1rem; border-radius: 10px; border: 1px solid var(--border); font-size: 0.95rem; }
+.alert-success { background: rgba(120, 220, 160, 0.12); border-color: rgba(120, 220, 160, 0.4); }
+.alert-error   { background: rgba(255, 90, 110, 0.12); border-color: rgba(255, 90, 110, 0.4); }
+.alert-warning { background: rgba(255, 200, 100, 0.12); border-color: rgba(255, 200, 100, 0.4); }
+
+/* --- Footer --- */
+footer { border-top: 1px solid var(--border); margin-top: 2rem; padding: 3rem 2rem; text-align: center; color: var(--muted); flex-shrink: 0; }
+.footer-brand { font-weight: 700; letter-spacing: 0.06em; margin-bottom: 0.6rem; }
+.footer-tagline { font-family: "Spectral", serif; font-style: italic; font-size: 0.9rem; }
+
+/* --- Modal (image pop-up in the Atlas) --- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(3, 4, 10, 0.82);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 5vh 1rem;
+    overflow-y: auto;
+    z-index: 100;
+}
+.modal-overlay.open { display: flex; }
+/* Centered variant (e.g. the short password pop-up). Vertically centres the
+   card; horizontal centring + scroll-on-small-screens stay from the base rule.
+   The Atlas image modal keeps the base flex-start (it holds tall images). */
+.modal-overlay.modal-centered { align-items: center; }
+.modal-card {
+    position: relative;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 1.8rem;
+    max-width: 760px;
+    width: 100%;
+}
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    font-size: 1.1rem;
+    cursor: pointer;
+    line-height: 1;
+}
+.modal-close:hover { background: rgba(255, 255, 255, 0.12); }
+
+/* Universe photo + the user's personal photo, side by side. */
+.modal-photos { display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: start; }
+.modal-photos.has-personal { grid-template-columns: 1fr 1fr; }
+.modal-photo { margin: 0; }
+.modal-photo img { width: 100%; max-height: 46vh; object-fit: contain; background: var(--bg-soft); }
+/* With two photos, force both into identical boxes so they match exactly.
+   object-fit: cover fills the whole box (cropping a little) so a square
+   NASA shot and a landscape personal photo become the same rectangle. */
+.modal-photos.has-personal .modal-photo img { height: 38vh; max-height: none; object-fit: cover; }
+.modal-photo figcaption {
+    color: var(--muted);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-top: 0.55rem;
+    text-align: center;
+}
+/* Discreet "remove memory" control, tucked under the file picker. */
+.modal-remove {
+    display: inline-flex;
+    gap: 0.45rem;
+    align-items: center;
+    width: fit-content;
+    margin-top: 0.6rem;
+    color: var(--muted);
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.modal-remove:hover { color: var(--text); }
+.modal-remove input { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; }
+input[type="file"].input-field { padding: 0.55rem 0.7rem; cursor: pointer; }
+@media (max-width: 560px) {
+    .modal-photos.has-personal { grid-template-columns: 1fr; }
+    .modal-photos.has-personal .modal-photo img { height: auto; max-height: 40vh; }
+}
+
+/* --- Schermata di caricamento (cosmic loader) --- */
+.cosmic-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.8rem;
+    /* Same cosmic backdrop as the body. */
+    background:
+        radial-gradient(1200px 600px at 80% -10%, #1a1f3a 0%, transparent 60%),
+        radial-gradient(900px 500px at 0% 10%, #161a30 0%, transparent 55%),
+        var(--bg);
+    transition: opacity 0.5s ease;
+}
+.cosmic-loader.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* The spinning orbit ring. */
+.loader-orbit {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    animation: orbit-spin 2.6s linear infinite;
+}
+/* The little planet riding the orbit (top of the ring). */
+.loader-planet {
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+}
+/* The glowing star at the centre. Sitting dead-centre, the orbit's rotation
+   is visually imperceptible, so it reads as still. */
+.loader-core {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ffffff 0%, var(--accent) 70%);
+    box-shadow: 0 0 24px 4px var(--accent-soft);
+}
+
+/* Twinkling background stars on the overlay. */
+.loader-star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: #ffffff;
+    animation: twinkle 2s ease-in-out infinite;
+}
+.cosmic-loader > .loader-star:nth-child(3) { animation-delay: 0s; }
+.cosmic-loader > .loader-star:nth-child(4) { animation-delay: 0.4s; }
+.cosmic-loader > .loader-star:nth-child(5) { animation-delay: 0.8s; }
+.cosmic-loader > .loader-star:nth-child(6) { animation-delay: 1.2s; }
+.cosmic-loader > .loader-star:nth-child(7) { animation-delay: 1.6s; }
+
+.loader-text {
+    font-family: "Spectral", serif;
+    font-style: italic;
+    color: var(--muted);
+    font-size: 1.1rem;
+    letter-spacing: 0.3px;
+    animation: text-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes orbit-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+@keyframes twinkle {
+    0% { opacity: 0.2; }
+    50% { opacity: 1; }
+    100% { opacity: 0.2; }
+}
+@keyframes text-pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
+
+/* Respect users who prefer less motion: freeze every loader animation. */
+@media (prefers-reduced-motion: reduce) {
+    .loader-orbit,
+    .loader-planet,
+    .loader-core,
+    .loader-star,
+    .loader-text {
+        animation: none;
+    }
+}
+
+/* --- Pagine d'errore (404 / 500) --- */
+.error-page {
+    text-align: center;
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 5rem 1rem;
+}
+.error-code {
+    font-size: 6rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--accent);
+    /* Soft luminous halo, in tune with the cosmic loader's glow. */
+    text-shadow: 0 0 30px var(--accent-soft), 0 0 60px var(--accent-soft);
+    margin-bottom: 0.5rem;
+}
+.error-page h1 {
+    margin: 0.2rem 0 0.6rem;
+}
+.error-page .muted {
+    max-width: 42ch;
+    margin: 0 auto;
+}
