@@ -3,23 +3,28 @@
 {% block title %}Overview · Il tuo viaggio{% endblock %}
 
 {% block content %}
-<p class="ov-eyebrow">La tua cronologia</p>
-<h1>Il tuo viaggio</h1>
-<p class="muted">{{ total_searches }} {{ 'immagine esplorata' if total_searches == 1 else 'immagini esplorate' }} finora</p>
+<div class="page-head" data-reveal>
+    <p class="ov-eyebrow">La tua cronologia</p>
+    <h1>Il tuo viaggio</h1>
+    <p class="muted" style="margin-top:0.5rem;">{{ total_searches }} {{ 'immagine esplorata' if total_searches == 1 else 'immagini esplorate' }} finora</p>
+</div>
 
 {% if not searches %}
-    <p class="muted" style="margin-top:1.5rem;">Non hai ancora esplorato nulla. <a href="/explore" style="color:var(--accent);">Inizia qui →</a></p>
+    <div class="ov-card" data-reveal style="text-align:center; padding:3rem 1.5rem;">
+        <div style="font-size:2.4rem;">🔭</div>
+        <p class="muted" style="margin-top:0.8rem;">Non hai ancora esplorato nulla. <a href="/explore" style="color:var(--accent);">Inizia qui →</a></p>
+    </div>
 {% else %}
-    <ul style="list-style:none; margin-top:1.5rem; display:flex; flex-direction:column; gap:0.6rem;">
+    <ul class="timeline" data-reveal>
         {% for search in searches %}
-            <li class="ov-card" style="padding:0.9rem 1.2rem; display:flex; justify-content:space-between; gap:1rem;">
+            <li>
                 <strong>{{ search.image_title }}</strong>
                 <span class="muted" style="white-space:nowrap;">{{ search.viewed_at.strftime('%d/%m/%Y · %H:%M') }}</span>
             </li>
         {% endfor %}
     </ul>
 
-    <form method="POST" action="{{ url_for('clear_history') }}" style="margin-top:1.5rem;"
+    <form method="POST" action="{{ url_for('clear_history') }}" style="margin-top:1.8rem;"
           onsubmit="return confirm('Cancellare tutta la cronologia?')">
         <button type="submit" class="btn btn-danger">Pulisci cronologia</button>
     </form>

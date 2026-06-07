@@ -3,9 +3,10 @@
 {% block title %}Overview · Registrazione{% endblock %}
 
 {% block content %}
-<section class="auth">
+<section class="auth" data-reveal>
     <p class="ov-eyebrow">Inizia il tuo atlante</p>
     <h1>Crea account</h1>
+    <p class="muted" style="margin:0.3rem 0 1.4rem;">Pochi passi e il cosmo diventa il tuo.</p>
 
     <form action="/register" method="POST" class="auth-form">
         {{ form.hidden_tag() }}

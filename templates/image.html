@@ -3,23 +3,33 @@
 {% block title %}Overview · {{ heading }}{% endblock %}
 
 {% block content %}
-<p class="ov-eyebrow">{{ heading }}</p>
+<div class="page-head" data-reveal>
+    <p class="ov-eyebrow">{{ heading }}</p>
+</div>
 
 {% if image %}
-<article class="ov-card">
+<article data-reveal>
     {% if image.image_url %}
-        <img src="{{ image.image_url }}" alt="{{ image.title }}" class="ov-image ov-image--hero">
+        <figure class="shot">
+            <img src="{{ image.image_url }}" alt="{{ image.title }}" class="ov-image--hero">
+            <span class="shot-veil"></span>
+            <figcaption class="shot-cap">
+                <h1>{{ image.title }}</h1>
+                <p class="meta">{{ image.pretty_date }}{% if image.copyright %} · © {{ image.copyright }}{% endif %}</p>
+            </figcaption>
+        </figure>
+    {% else %}
+        <h1>{{ image.title }}</h1>
+        <p class="muted">{{ image.pretty_date }}{% if image.copyright %} · © {{ image.copyright }}{% endif %}</p>
     {% endif %}
-    <h1 style="margin-top:1.2rem;">{{ image.title }}</h1>
-    <p class="muted">{{ image.pretty_date }}{% if image.copyright %} · © {{ image.copyright }}{% endif %}</p>
 
     {% if current_user %}
-    <form method="POST" action="{{ url_for('save_image') }}" enctype="multipart/form-data" style="margin-top:1rem;">
+    <form method="POST" action="{{ url_for('save_image') }}" enctype="multipart/form-data" class="detail-save" style="margin-top:1rem;">
         <input type="hidden" name="title" value="{{ image.title }}">
         <input type="hidden" name="date" value="{{ image.date }}">
         <input type="hidden" name="image_url" value="{{ image.image_url }}">
         <input type="hidden" name="explanation" value="{{ image.explanation }}">
-        <div class="form-field" style="max-width:420px;">
+        <div class="form-field" style="max-width:460px;">
             <label for="image-personal">Allega una tua foto, un ricordo di quel giorno (opzionale)</label>
             <input type="file" id="image-personal" name="personal_image" accept="image/*" class="input-field">
         </div>
@@ -33,5 +43,5 @@
     <p class="muted">Non riesco a caricare l'immagine adesso. Riprova tra poco.</p>
 {% endif %}
 
-<p style="margin-top:1.5rem;"><a href="/surprise" class="btn btn-ghost">Mostrami un'altra →</a></p>
+<p style="margin-top:1.8rem;"><a href="/surprise" class="btn btn-ghost">Mostrami un'altra →</a></p>
 {% endblock %}

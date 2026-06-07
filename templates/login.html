@@ -3,9 +3,10 @@
 {% block title %}Overview · Accedi{% endblock %}
 
 {% block content %}
-<section class="auth">
+<section class="auth" data-reveal>
     <p class="ov-eyebrow">Bentornata</p>
     <h1>Accedi</h1>
+    <p class="muted" style="margin:0.3rem 0 1.4rem;">Riprendi il tuo viaggio tra le stelle.</p>
 
     <form action="/login" method="POST" class="auth-form">
         {{ form.hidden_tag() }}

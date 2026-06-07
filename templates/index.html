@@ -3,22 +3,63 @@
 {% block title %}Overview · Stesso cielo. Nuovo sguardo.{% endblock %}
 
 {% block content %}
-<section style="text-align:center; padding:3rem 0;">
-    <p class="ov-eyebrow">Una foto dell'universo al giorno, dal 1995</p>
-    <h1 style="font-size:3rem; max-width:14ch; margin:0.8rem auto;">Stesso cielo.<br>Nuovo sguardo.</h1>
-    <p class="muted" style="max-width:54ch; margin:1rem auto 2rem; font-family:'Spectral',serif; font-size:1.1rem;">
-        Dal 16 giugno 1995 la NASA pubblica ogni giorno una foto dell'universo.
-        Con <strong style="color:var(--text);">Overview</strong> puoi esplorare quell'archivio
-        e salvare le immagini che ti colpiscono, costruendo a poco a poco il tuo atlante del cosmo.
-    </p>
-    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
-        <a href="/today" class="btn btn-primary">Guarda il cielo di oggi</a>
-        <a href="/surprise" class="btn">Sorprendimi</a>
-        {% if not current_user %}
-            <a href="/register" class="btn btn-ghost">Crea il tuo atlante</a>
-        {% else %}
-            <a href="/atlas" class="btn btn-ghost">Apri il tuo atlante</a>
-        {% endif %}
+<section class="hero">
+    <canvas class="hero-galaxy" aria-hidden="true"></canvas>
+    <div class="hero-inner">
+        <p class="ov-eyebrow">Una foto dell'universo al giorno, dal 1995</p>
+        <h1 class="hero-title">Overview</h1>
+        <p class="hero-tagline">Stesso cielo. Nuovo sguardo.</p>
+        <p class="hero-sub">
+            Dal 16 giugno 1995 la NASA pubblica ogni giorno una foto dell'universo.
+            Esplora quell'archivio infinito e colleziona le immagini che ti tolgono il fiato,
+            costruendo a poco a poco il tuo atlante personale del cosmo.
+        </p>
+        <div class="hero-cta">
+            <a href="/today" class="btn btn-primary">Guarda il cielo di oggi</a>
+            <a href="/surprise" class="btn">Sorprendimi</a>
+            {% if not current_user %}
+                <a href="/register" class="btn btn-ghost">Crea il tuo atlante</a>
+            {% else %}
+                <a href="/atlas" class="btn btn-ghost">Apri il tuo atlante</a>
+            {% endif %}
+        </div>
     </div>
+    <a href="#scopri" class="scroll-cue" aria-label="Scorri giù">
+        <span class="mouse"></span>
+        <span>scorri</span>
+    </a>
+</section>
+
+<section id="scopri" class="feature-grid" data-reveal="grid">
+    <div class="feature">
+        <div class="ico">🛰️</div>
+        <h3>Il cielo di oggi</h3>
+        <p>Ogni giorno una nuova immagine astronomica scelta e raccontata dalla NASA.</p>
+    </div>
+    <div class="feature">
+        <div class="ico">🌌</div>
+        <h3>30 anni di archivio</h3>
+        <p>Viaggia indietro fino al 16 giugno 1995 e scopri il cosmo di qualsiasi data.</p>
+    </div>
+    <div class="feature">
+        <div class="ico">⭐</div>
+        <h3>Il tuo atlante</h3>
+        <p>Salva, annota e organizza in collezioni le immagini che ti appartengono.</p>
+    </div>
+    <div class="feature">
+        <div class="ico">🎂</div>
+        <h3>Il cielo della tua nascita</h3>
+        <p>Scopri quale meraviglia l'universo mostrava il giorno in cui sei venuta al mondo.</p>
+    </div>
+</section>
+
+<section data-reveal style="text-align:center; margin-top:5rem;">
+    <p class="ov-eyebrow">Overview effect</p>
+    <h2 style="max-width:22ch; margin:0.6rem auto 1rem;">Cambia prospettiva. Guarda più lontano.</h2>
+    <p class="muted" style="max-width:56ch; margin:0 auto; font-family:'Spectral',serif; font-size:1.15rem;">
+        È la sensazione che provano gli astronauti guardando la Terra dallo spazio.
+        <strong style="color:var(--ink);">Overview</strong> porta un po' di quello stupore
+        sul tuo schermo, una notte stellata alla volta.
+    </p>
 </section>
 {% endblock %}

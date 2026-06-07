@@ -15,51 +15,53 @@
 {% endif %}
 
 <section class="profile">
-    <p class="ov-eyebrow">Il tuo account</p>
-    <h1>Profilo</h1>
+    <div class="page-head" data-reveal>
+        <p class="ov-eyebrow">Il tuo account</p>
+        <h1>Profilo</h1>
 
-    {% if bg_url %}
-    <p class="muted" style="margin-top:-0.4rem; font-size:0.85rem;">
-        {% if is_real_birthday %}
-        Il cielo del giorno della tua nascita · {{ pretty_date }}
-        {% else %}
-        Il cielo del {{ pretty_date }} — il primo anno in cui la NASA lo ha fotografato
+        {% if bg_url %}
+        <p class="profile-cap" style="margin-top:0.5rem; font-size:0.95rem;">
+            {% if is_real_birthday %}
+            Il cielo del giorno della tua nascita · {{ pretty_date }}
+            {% else %}
+            Il cielo del {{ pretty_date }} — il primo anno in cui la NASA lo ha fotografato
+            {% endif %}
+        </p>
         {% endif %}
-    </p>
-    {% endif %}
+    </div>
 
-    <div class="ov-card" style="margin-top:1rem;">
-        <div class="profile-row" style="display:flex; justify-content:space-between; padding:0.4rem 0;">
+    <div class="ov-card" data-reveal style="margin-top:1rem;">
+        <div class="profile-row" style="display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid var(--line);">
             <span class="muted">Username</span>
             <span>{{ user.username }}</span>
         </div>
-        <div class="profile-row" style="display:flex; justify-content:space-between; padding:0.4rem 0;">
+        <div class="profile-row" style="display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid var(--line);">
             <span class="muted">Email</span>
             <span>{{ user.email }}</span>
         </div>
-        <div class="profile-row" style="display:flex; justify-content:space-between; padding:0.4rem 0;">
+        <div class="profile-row" style="display:flex; justify-content:space-between; padding:0.5rem 0;">
             <span class="muted">Iscritta dal</span>
             <span>{{ user.created_at.strftime('%d/%m/%Y') }}</span>
         </div>
     </div>
 
     <h2>I tuoi numeri</h2>
-    <div class="ov-grid" style="grid-template-columns:repeat(3, 1fr);">
-        <div class="ov-card" style="text-align:center;">
-            <p style="font-size:2rem; font-weight:700;">{{ images_count }}</p>
-            <p class="muted" style="font-size:0.85rem;">Immagini salvate</p>
+    <div class="ov-grid" data-reveal="grid" style="grid-template-columns:repeat(3, 1fr);">
+        <div class="ov-card stat-card">
+            <p class="stat-num" data-count="{{ images_count }}">0</p>
+            <p class="stat-label">Immagini salvate</p>
         </div>
-        <div class="ov-card" style="text-align:center;">
-            <p style="font-size:2rem; font-weight:700;">{{ searches_count }}</p>
-            <p class="muted" style="font-size:0.85rem;">Immagini esplorate</p>
+        <div class="ov-card stat-card">
+            <p class="stat-num" data-count="{{ searches_count }}">0</p>
+            <p class="stat-label">Immagini esplorate</p>
         </div>
-        <div class="ov-card" style="text-align:center;">
+        <div class="ov-card stat-card">
             <p style="font-size:1.1rem; font-weight:600; margin-top:0.4rem;">{{ most_viewed or 'nessuna' }}</p>
-            <p class="muted" style="font-size:0.85rem;">La più rivisitata</p>
+            <p class="stat-label">La più rivisitata</p>
         </div>
     </div>
 
-    <p style="margin-top:2rem; display:flex; gap:0.8rem; align-items:center; flex-wrap:wrap;">
+    <p data-reveal style="margin-top:2.4rem; display:flex; gap:0.8rem; align-items:center; flex-wrap:wrap;">
         <button type="button" class="btn" id="open-pw-modal">Cambia password</button>
         <a href="/logout" class="logout-btn">Esci</a>
     </p>

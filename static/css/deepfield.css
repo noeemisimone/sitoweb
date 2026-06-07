@@ -1,0 +1,567 @@
+/* =====================================================================
+   OVERVIEW — "DEEP FIELD" design language.
+   A bold, cinematic, animated space identity layered over the base theme.
+   This file is loaded AFTER style.css and intentionally overrides it.
+   Nothing here changes Flask/Jinja contracts — presentation only.
+   ===================================================================== */
+
+:root {
+    /* Expanded cosmic palette (base --bg/--accent etc. stay defined). */
+    --space-0: #03040a;          /* deepest void */
+    --space-1: #070912;          /* page base */
+    --space-2: #0c0f1d;          /* raised surface */
+    --ink: #eef0ff;              /* primary text */
+    --ink-dim: #9aa0c4;          /* secondary text */
+    --line: rgba(255, 255, 255, 0.10);
+
+    --blue: #8ea2ff;             /* = --accent */
+    --violet: #b98cff;           /* nebula violet */
+    --cyan: #7fe9ff;             /* cold star */
+    --star: #ffd6a6;             /* warm star highlight */
+    --danger: #ff6f85;
+
+    --grad-cosmic: linear-gradient(120deg, var(--blue), var(--violet) 60%, var(--cyan));
+    --grad-text: linear-gradient(180deg, #ffffff 0%, var(--blue) 70%, var(--violet) 130%);
+
+    --glass: rgba(255, 255, 255, 0.045);
+    --glass-2: rgba(255, 255, 255, 0.07);
+    --glass-brd: rgba(255, 255, 255, 0.12);
+    --glow: 0 0 40px rgba(142, 162, 255, 0.45);
+    --glow-violet: 0 0 50px rgba(185, 140, 255, 0.40);
+    --shadow-deep: 0 40px 120px -50px rgba(0, 0, 0, 0.9);
+
+    --r-lg: 22px;
+    --r-md: 16px;
+    --r-sm: 11px;
+    --ease: cubic-bezier(0.16, 0.84, 0.30, 1);
+    --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------- Base canvas ---------- */
+html { scroll-behavior: smooth; }
+
+body {
+    /* Darker, deeper base; the animated canvas paints the cosmos behind. */
+    background: var(--space-1);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+}
+/* Static nebula wash as a graceful fallback under the canvas. */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    pointer-events: none;
+    background:
+        radial-gradient(70vw 70vw at 82% -8%, rgba(142, 162, 255, 0.12), transparent 60%),
+        radial-gradient(60vw 60vw at 6% 102%, rgba(185, 140, 255, 0.10), transparent 60%),
+        radial-gradient(40vw 40vw at 50% 50%, rgba(127, 233, 255, 0.05), transparent 70%),
+        var(--space-0);
+}
+
+/* Animated background canvas + cursor FX canvas. */
+#space-bg, #cursor-fx {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: block;
+}
+#space-bg { z-index: -2; }
+#cursor-fx { z-index: 9998; }   /* floats above content, just under the loader; pointer:none */
+
+/* On the profile page the birthday photo owns the backdrop. */
+body.has-profile-bg #space-bg,
+body.has-profile-bg::after { opacity: 0; }
+
+main {
+    max-width: 1160px;
+    padding: 3rem 1.6rem 6rem;
+    position: relative;
+    z-index: 2;
+}
+
+/* ---------- Typography ---------- */
+h1, h2, h3 { letter-spacing: -0.03em; line-height: 1.04; }
+h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); }
+h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); margin: 2.4rem 0 1rem; }
+
+.ov-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.34em;
+    color: var(--blue);
+    text-transform: uppercase;
+    position: relative;
+    display: inline-block;
+}
+.ov-eyebrow::before {
+    content: "";
+    display: inline-block;
+    width: 26px;
+    height: 1px;
+    margin-right: 0.7rem;
+    vertical-align: middle;
+    background: linear-gradient(90deg, transparent, var(--blue));
+}
+
+.muted { color: var(--ink-dim); }
+
+::selection { background: rgba(142, 162, 255, 0.30); color: #fff; }
+* { scrollbar-width: thin; scrollbar-color: rgba(142,162,255,0.5) transparent; }
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--blue), var(--violet));
+    border-radius: 999px; border: 3px solid var(--space-1);
+}
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ---------- Navbar: floating glass bar ---------- */
+.navbar {
+    position: sticky;
+    top: 14px;
+    z-index: 50;
+    margin: 14px auto 0;
+    max-width: 1160px;
+    width: calc(100% - 2rem);
+    padding: 0.7rem 1.3rem;
+    border-radius: 999px;
+    border: 1px solid var(--glass-brd);
+    background: rgba(8, 10, 22, 0.55);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    box-shadow: 0 18px 50px -25px rgba(0, 0, 0, 0.85);
+}
+.navbar-brand { font-size: 1.3rem; letter-spacing: 0.12em; }
+.navbar-brand::before { content: "◉ "; color: var(--blue); }
+.navbar-brand a { transition: text-shadow 0.35s var(--ease); }
+.navbar-brand:hover a { text-shadow: 0 0 22px rgba(142, 162, 255, 0.8); }
+.navbar-links { gap: 1.6rem; }
+.navbar-links a {
+    position: relative;
+    font-size: 0.92rem;
+    letter-spacing: 0.01em;
+    padding: 0.2rem 0;
+}
+.navbar-links a:not(.navbar-user)::after {
+    content: "";
+    position: absolute; left: 0; bottom: -4px;
+    width: 100%; height: 2px; border-radius: 2px;
+    background: var(--grad-cosmic);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.34s var(--ease);
+}
+.navbar-links a:not(.navbar-user):hover::after,
+.navbar-links a.active:not(.navbar-user)::after { transform: scaleX(1); }
+.navbar-links a.active:not(.navbar-user)::after { display: none; } /* override base block underline */
+.navbar-links a.active:not(.navbar-user) { color: var(--ink); }
+.navbar-links a.active:not(.navbar-user)::before { display: none; }
+.navbar-user {
+    background: var(--glass-2);
+    border-color: var(--glass-brd);
+    transition: box-shadow 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+.navbar-user:hover { box-shadow: var(--glow); border-color: var(--blue); }
+
+/* ---------- Buttons: glow + shine + magnetic ---------- */
+.btn, .auth-submit, .back-link, .logout-btn {
+    position: relative;
+    overflow: hidden;
+    border-radius: 999px;
+    padding: 0.8rem 1.6rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    border: 1px solid var(--glass-brd);
+    background: var(--glass-2);
+    color: var(--ink);
+    transition: transform 0.2s var(--ease), box-shadow 0.3s var(--ease), background 0.25s ease;
+    will-change: transform;
+}
+.btn::before, .auth-submit::before {
+    content: "";
+    position: absolute; top: 0; left: -130%;
+    width: 55%; height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,0.35), transparent);
+    transform: skewX(-18deg);
+    transition: left 0.6s var(--ease);
+}
+.btn:hover::before, .auth-submit:hover::before { left: 150%; }
+.btn:hover, .auth-submit:hover, .back-link:hover, .logout-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 36px -12px rgba(142, 162, 255, 0.5);
+}
+.btn:active, .auth-submit:active { transform: translateY(-1px) scale(0.98); }
+.btn-primary, .auth-submit {
+    background: var(--grad-cosmic);
+    color: #060713;
+    border-color: transparent;
+    box-shadow: 0 10px 30px -12px rgba(142, 162, 255, 0.6);
+}
+.btn-primary:hover, .auth-submit:hover { box-shadow: 0 18px 46px -12px rgba(142, 162, 255, 0.75); }
+.btn-ghost { background: transparent; }
+.btn-danger {
+    background: rgba(255, 111, 133, 0.14);
+    border-color: rgba(255, 111, 133, 0.45);
+    color: #ffc2cc;
+}
+.btn-danger:hover { box-shadow: 0 14px 36px -12px rgba(255, 111, 133, 0.45); }
+
+/* ---------- Glass cards ---------- */
+.ov-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-brd);
+    border-radius: var(--r-md);
+    -webkit-backdrop-filter: blur(12px) saturate(130%);
+    backdrop-filter: blur(12px) saturate(130%);
+    box-shadow: var(--shadow-deep);
+    transition: transform 0.3s var(--ease), box-shadow 0.4s var(--ease), border-color 0.3s var(--ease);
+    position: relative;
+}
+a.ov-card, .atlas-card { cursor: pointer; }
+a.ov-card:hover, .atlas-card:hover {
+    border-color: rgba(142, 162, 255, 0.55);
+    box-shadow: 0 30px 70px -30px rgba(142, 162, 255, 0.5), 0 0 0 1px rgba(142,162,255,0.25);
+}
+
+.ov-eyebrow { z-index: 1; }
+.ov-explanation {
+    color: var(--ink-dim);
+    font-family: "Spectral", serif;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    max-width: 70ch;
+}
+.ov-note {
+    border-left: 2px solid;
+    border-image: var(--grad-cosmic) 1;
+    background: rgba(142, 162, 255, 0.06);
+    border-radius: 0 10px 10px 0;
+    padding: 0.6rem 0.9rem;
+}
+
+/* ---------- Grids ---------- */
+.ov-grid { gap: 1.4rem; }
+
+/* ---------- Forms ---------- */
+.input-field {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-brd);
+    border-radius: var(--r-sm);
+    padding: 0.85rem 1.05rem;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+.input-field:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(142, 162, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+}
+.form-field label { letter-spacing: 0.02em; }
+
+/* Auth pages: centered glass console with aura. */
+.auth {
+    max-width: 440px;
+    margin: 3rem auto;
+    padding: 2.4rem 2rem;
+    border-radius: var(--r-lg);
+    background: var(--glass);
+    border: 1px solid var(--glass-brd);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    backdrop-filter: blur(16px) saturate(140%);
+    box-shadow: var(--shadow-deep), inset 0 1px 0 rgba(255,255,255,0.06);
+    position: relative;
+    overflow: hidden;
+}
+.auth::before {
+    content: "";
+    position: absolute; inset: -2px -2px auto -2px; height: 120px;
+    background: radial-gradient(120% 100% at 50% 0, rgba(142,162,255,0.25), transparent 70%);
+    pointer-events: none;
+}
+.auth h1 { font-size: clamp(2rem, 5vw, 2.6rem); }
+.auth-submit { width: 100%; text-align: center; margin-top: 0.4rem; }
+.auth-link a { color: var(--blue); }
+
+/* ---------- Flash messages ---------- */
+.alert {
+    border-radius: 12px;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-brd);
+}
+
+/* ---------- Footer ---------- */
+footer {
+    border-top: 1px solid var(--line);
+    background: linear-gradient(180deg, transparent, rgba(142,162,255,0.04));
+    padding: 4rem 2rem 3rem;
+    position: relative;
+    z-index: 2;
+}
+.footer-brand { font-size: 1.4rem; letter-spacing: 0.1em; }
+.footer-brand::before { content: "◉ "; color: var(--blue); }
+
+/* =====================================================================
+   HOME — galaxy hero
+   ===================================================================== */
+.hero {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-top: -3rem;
+    min-height: min(92vh, 880px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    padding: 6rem 1.5rem 4rem;
+}
+.hero canvas.hero-galaxy {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+}
+.hero-inner { position: relative; z-index: 2; max-width: 820px; }
+.hero-title {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: clamp(3.6rem, 15vw, 10rem);
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+    margin: 1rem 0 0.4rem;
+    background: var(--grad-text);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 50px rgba(142, 162, 255, 0.45));
+}
+.hero-tagline {
+    font-family: "Spectral", serif;
+    font-style: italic;
+    font-size: clamp(1.15rem, 3vw, 1.7rem);
+    color: var(--ink);
+}
+.hero-sub {
+    max-width: 54ch;
+    margin: 1.2rem auto 2.2rem;
+    color: var(--ink-dim);
+    font-size: 1.06rem;
+    line-height: 1.7;
+}
+.hero-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+.scroll-cue {
+    position: absolute; left: 50%; bottom: 1.6rem; transform: translateX(-50%);
+    z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    color: var(--ink-dim); text-decoration: none;
+    font-size: 0.66rem; letter-spacing: 0.3em; text-transform: uppercase;
+}
+.scroll-cue .mouse {
+    width: 24px; height: 38px; border: 1.5px solid var(--glass-brd); border-radius: 999px; position: relative;
+}
+.scroll-cue .mouse::before {
+    content: ""; position: absolute; left: 50%; top: 7px; width: 4px; height: 8px;
+    margin-left: -2px; border-radius: 999px; background: var(--blue);
+    animation: cue-bob 1.8s ease-in-out infinite;
+}
+.scroll-cue:hover { color: var(--ink); }
+@keyframes cue-bob { 0% {transform: translateY(0); opacity:1;} 70% {transform: translateY(12px); opacity:0.1;} 100% {transform: translateY(0); opacity:1;} }
+
+/* Feature strip under the hero. */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.4rem;
+    margin-top: 3rem;
+}
+.feature {
+    padding: 1.6rem;
+    border-radius: var(--r-md);
+    background: var(--glass);
+    border: 1px solid var(--glass-brd);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    transition: transform 0.3s var(--ease), box-shadow 0.35s var(--ease), border-color 0.3s;
+}
+.feature:hover { transform: translateY(-6px); border-color: rgba(142,162,255,0.4); box-shadow: var(--glow); }
+.feature .ico { font-size: 1.6rem; }
+.feature h3 { margin: 0.7rem 0 0.4rem; font-size: 1.15rem; }
+.feature p { color: var(--ink-dim); font-size: 0.95rem; }
+
+/* Section heading block used across pages. */
+.page-head { margin-bottom: 2rem; }
+.page-head h1 {
+    background: var(--grad-text);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 30px rgba(142,162,255,0.25));
+}
+
+/* =====================================================================
+   IMAGE DETAIL (Today / Surprise / Explore result) — cinematic hero
+   ===================================================================== */
+.shot {
+    position: relative;
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    background: var(--space-2);
+    box-shadow: var(--shadow-deep);
+    margin-bottom: 1.6rem;
+}
+.shot .ov-image--hero {
+    width: 100%;
+    max-height: 76vh;
+    object-fit: contain;
+    border: none; border-radius: 0;
+    background: #000;
+    display: block;
+    animation: kenburns 28s ease-in-out infinite alternate;
+}
+.shot .shot-veil {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+        linear-gradient(to top, rgba(3,4,10,0.85) 0%, transparent 42%),
+        radial-gradient(130% 90% at 50% 130%, rgba(142,162,255,0.16), transparent 60%);
+}
+.shot .shot-cap {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 2rem 2rem 1.6rem; text-align: left;
+}
+.shot .shot-cap h1 {
+    font-size: clamp(1.8rem, 4.5vw, 3rem);
+    text-shadow: 0 4px 30px rgba(0,0,0,0.8);
+    margin: 0;
+}
+.shot .shot-cap .meta { color: var(--ink); opacity: 0.85; font-family: "Spectral", serif; font-style: italic; margin-top: 0.3rem; }
+@keyframes kenburns { from { transform: scale(1.02); } to { transform: scale(1.09); } }
+
+.detail-actions { display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; margin: 1.2rem 0; }
+
+/* =====================================================================
+   ATLAS
+   ===================================================================== */
+.atlas-card {
+    padding: 0 !important;
+    border-radius: var(--r-md);
+    transition: transform 0.28s var(--ease), box-shadow 0.4s var(--ease), border-color 0.3s;
+}
+.atlas-card .ov-image {
+    transition: transform 0.6s var(--ease);
+    aspect-ratio: 4 / 3; object-fit: cover; border: none;
+    border-radius: var(--r-md) var(--r-md) 0 0;
+}
+.atlas-card:hover .ov-image { transform: scale(1.07); }
+.favorite-badge {
+    box-shadow: 0 6px 20px -6px rgba(0,0,0,0.7);
+    border: 1px solid rgba(255, 214, 166, 0.5);
+    background: rgba(3,4,10,0.7) !important;
+}
+.collection-create {
+    border: 1px dashed var(--glass-brd);
+    background: var(--glass);
+    border-radius: var(--r-md);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.collection-head h2 {
+    background: var(--grad-text);
+    -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+}
+
+/* =====================================================================
+   PROFILE — stats with animated counters
+   ===================================================================== */
+.profile { max-width: 760px; }
+.stat-card { text-align: center; padding: 1.6rem 1rem; }
+.stat-num {
+    font-size: clamp(2.2rem, 6vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1;
+    background: var(--grad-text);
+    -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 20px rgba(142,162,255,0.3));
+}
+.stat-label { color: var(--ink-dim); font-size: 0.82rem; letter-spacing: 0.05em; margin-top: 0.4rem; }
+.profile-cap {
+    font-family: "Spectral", serif; font-style: italic;
+    color: var(--ink); opacity: 0.9;
+}
+
+/* =====================================================================
+   HISTORY — timeline
+   ===================================================================== */
+.timeline { list-style: none; position: relative; margin-top: 2rem; padding-left: 1.6rem; }
+.timeline::before {
+    content: ""; position: absolute; left: 5px; top: 6px; bottom: 6px; width: 2px;
+    background: linear-gradient(var(--blue), transparent);
+}
+.timeline li {
+    position: relative;
+    display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    padding: 0.9rem 1.2rem; margin-bottom: 0.8rem;
+    border-radius: var(--r-sm);
+    background: var(--glass); border: 1px solid var(--glass-brd);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    transition: transform 0.25s var(--ease), border-color 0.25s;
+}
+.timeline li:hover { transform: translateX(4px); border-color: rgba(142,162,255,0.4); }
+.timeline li::before {
+    content: ""; position: absolute; left: -1.6rem; top: 1.2rem; width: 10px; height: 10px;
+    border-radius: 50%; background: var(--blue); box-shadow: var(--glow);
+}
+
+/* =====================================================================
+   ERROR PAGES
+   ===================================================================== */
+.error-code {
+    font-size: clamp(5rem, 20vw, 11rem);
+    background: var(--grad-text);
+    -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 50px rgba(142,162,255,0.5));
+    line-height: 0.9;
+}
+
+/* =====================================================================
+   MOTION — scroll reveal (only active with .js so no-JS stays visible)
+   ===================================================================== */
+.js [data-reveal] {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s var(--ease-soft), transform 0.9s var(--ease);
+    will-change: opacity, transform;
+}
+.js [data-reveal].in { opacity: 1; transform: none; }
+.js [data-reveal][data-reveal="grid"] > * { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.7s var(--ease); }
+.js [data-reveal][data-reveal="grid"].in > * { opacity: 1; transform: none; }
+.js [data-reveal="grid"].in > *:nth-child(1){transition-delay:.05s}
+.js [data-reveal="grid"].in > *:nth-child(2){transition-delay:.11s}
+.js [data-reveal="grid"].in > *:nth-child(3){transition-delay:.17s}
+.js [data-reveal="grid"].in > *:nth-child(4){transition-delay:.23s}
+.js [data-reveal="grid"].in > *:nth-child(5){transition-delay:.29s}
+.js [data-reveal="grid"].in > *:nth-child(6){transition-delay:.35s}
+.js [data-reveal="grid"].in > *:nth-child(7){transition-delay:.41s}
+.js [data-reveal="grid"].in > *:nth-child(8){transition-delay:.47s}
+.js [data-reveal="grid"].in > *:nth-child(n+9){transition-delay:.53s}
+
+/* =====================================================================
+   RESPONSIVE
+   ===================================================================== */
+@media (max-width: 760px) {
+    main { padding: 2rem 1.1rem 5rem; }
+    .navbar { padding: 0.6rem 1rem; gap: 0.5rem; }
+    .navbar-links { gap: 1rem; }
+    .hero { min-height: 86vh; margin-top: -2rem; }
+    .shot .shot-cap { padding: 1.2rem; }
+}
+
+/* =====================================================================
+   REDUCED MOTION
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .shot .ov-image--hero { animation: none; }
+    .scroll-cue .mouse::before { animation: none; }
+    .btn::before, .auth-submit::before { display: none; }
+    .js [data-reveal], .js [data-reveal="grid"] > * {
+        opacity: 1 !important; transform: none !important; transition: none !important;
+    }
+}
