@@ -29,3 +29,6 @@ static/uploads/
 
 # File di sistema
 .DS_Store
+
+# Impostazioni locali di Claude Code — non versionare
+.claude/settings.local.json
