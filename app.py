@@ -4,7 +4,7 @@ from datetime import date, datetime
 from functools import wraps
 
 from flask import Flask, flash, redirect, render_template, request, session, url_for
-from sqlalchemy import func, text
+from sqlalchemy import func, inspect, text
 
 from config import config_map
 from forms import ExploreForm, LoginForm, RegisterForm
@@ -570,11 +570,15 @@ def server_error(error):
 
 
 def _ensure_schema():
-    """Lightweight migration. SQLite's create_all() creates missing tables but
-    never alters existing ones, so columns added after the DB was first built
-    must be patched in by hand. Adds them only if absent; keeps existing data."""
+    """Lightweight migration. create_all() creates missing tables but never
+    alters existing ones, so columns added after the DB was first built must be
+    patched in by hand. Adds them only if absent; keeps existing data.
+
+    Column detection uses SQLAlchemy's inspector so it works on both SQLite
+    (local) and PostgreSQL (production) — PRAGMA is SQLite-only and errors on PG."""
+    inspector = inspect(db.engine)
     with db.engine.connect() as conn:
-        cols = [row[1] for row in conn.execute(text("PRAGMA table_info(saved_image)"))]
+        cols = [c["name"] for c in inspector.get_columns("saved_image")]
         if "personal_image_url" not in cols:
             conn.execute(text("ALTER TABLE saved_image ADD COLUMN personal_image_url VARCHAR(500)"))
             conn.commit()
@@ -582,10 +586,10 @@ def _ensure_schema():
             conn.execute(text("ALTER TABLE saved_image ADD COLUMN collection_id INTEGER"))
             conn.commit()
         if "is_favorite" not in cols:
-            conn.execute(text("ALTER TABLE saved_image ADD COLUMN is_favorite BOOLEAN DEFAULT 0"))
+            conn.execute(text("ALTER TABLE saved_image ADD COLUMN is_favorite BOOLEAN DEFAULT FALSE"))
             conn.commit()
 
-        user_cols = [row[1] for row in conn.execute(text("PRAGMA table_info(user)"))]
+        user_cols = [c["name"] for c in inspector.get_columns("user")]
         if "birthdate" not in user_cols:
             conn.execute(text("ALTER TABLE user ADD COLUMN birthdate VARCHAR(20)"))
             conn.commit()
