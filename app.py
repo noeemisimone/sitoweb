@@ -26,6 +26,27 @@ db.init_app(app)
 
 
 # ---------------------------------------------------------------------------
+# Static asset cache-busting
+# ---------------------------------------------------------------------------
+# Browsers (and Render's CDN) cache CSS/JS aggressively, so a deploy alone
+# doesn't refresh them. We append a ?v=<version> query string to every static
+# URL: when the version changes, the URL changes, and the browser refetches.
+# On Render, RENDER_GIT_COMMIT is set per deploy and changes every time; in
+# local dev we fall back to a per-process timestamp.
+STATIC_VERSION = (
+    os.environ.get("RENDER_GIT_COMMIT")
+    or os.environ.get("STATIC_VERSION")
+    or str(int(datetime.now().timestamp()))
+)
+
+
+@app.url_defaults
+def add_static_version(endpoint, values):
+    if endpoint == "static" and "filename" in values:
+        values["v"] = STATIC_VERSION
+
+
+# ---------------------------------------------------------------------------
 # Personal-photo uploads
 # ---------------------------------------------------------------------------
 
