@@ -552,6 +552,43 @@ def delete_collection(collection_id):
     return redirect(url_for("atlas"))
 
 
+@app.route("/delete_account", methods=["POST"])
+@login_required
+def delete_account():
+    """Permanently delete the logged-in account and ALL its data: every saved
+    image (plus its uploaded personal photo on disk), collection and search
+    history row, then the user. Children are removed before the user so no
+    orphan rows are left (the models have no DB-level cascade)."""
+    user = User.query.get(session["user_id"])
+
+    # Collect the on-disk photo paths before the rows go away, so we can clean
+    # the files up after the DB commit succeeds.
+    photos_to_remove = [
+        img.personal_image_url for img in user.saved_images if img.personal_image_url
+    ]
+
+    try:
+        # SavedImage first: it references collection_id, so deleting it before
+        # the collections avoids any foreign-key violation.
+        SavedImage.query.filter_by(user_id=user.id).delete()
+        Collection.query.filter_by(user_id=user.id).delete()
+        SearchHistory.query.filter_by(user_id=user.id).delete()
+        db.session.delete(user)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        flash("Errore nell'eliminazione dell'account. Riprova.", "error")
+        return redirect(url_for("profile"))
+
+    # DB is clean — now drop the orphaned photo files from disk.
+    for path in photos_to_remove:
+        _delete_photo_file(path)
+
+    session.clear()
+    flash("Il tuo account è stato eliminato.", "success")
+    return redirect(url_for("index"))
+
+
 # ---------------------------------------------------------------------------
 # Error handlers
 # ---------------------------------------------------------------------------

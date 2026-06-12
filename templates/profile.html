@@ -64,6 +64,7 @@
     <p data-reveal style="margin-top:2.4rem; display:flex; gap:0.8rem; align-items:center; flex-wrap:wrap;">
         <button type="button" class="btn" id="open-pw-modal">Cambia password</button>
         <a href="/logout" class="logout-btn">Esci</a>
+        <button type="button" class="btn btn-danger" id="open-delete-modal">Elimina account</button>
     </p>
 </section>
 
@@ -98,6 +99,25 @@
     </div>
 </div>
 
+<!-- Pop-up: delete account. Irreversible, so it asks for confirmation first. -->
+<div class="modal-overlay modal-centered" id="delete-modal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+        <button type="button" class="modal-close" id="delete-modal-close" aria-label="Chiudi">✕</button>
+        <h2 style="margin-top:0;">Elimina account</h2>
+
+        <p style="margin-top:1rem;">
+            Questa operazione è <strong>irreversibile</strong>. Verranno cancellati
+            definitivamente il tuo account e <strong>tutti i tuoi dati</strong>: le
+            immagini salvate, le collezioni e la cronologia.
+        </p>
+
+        <form method="POST" action="{{ url_for('delete_account') }}" style="margin-top:1.4rem; display:flex; gap:0.8rem; flex-wrap:wrap;">
+            <button type="submit" class="btn btn-danger">Sì, elimina l'account</button>
+            <button type="button" class="btn" id="delete-modal-cancel">Annulla</button>
+        </form>
+    </div>
+</div>
+
 <script>
     (function () {
         var modal = document.getElementById('pw-modal');
@@ -109,6 +129,28 @@
 
         openBtn.addEventListener('click', openModal);
         closeBtn.addEventListener('click', closeModal);
+        // Click on the dark backdrop (but not inside the card) closes the pop-up.
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) closeModal();
+        });
+        // Esc closes it too.
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeModal();
+        });
+    })();
+
+    (function () {
+        var modal = document.getElementById('delete-modal');
+        var openBtn = document.getElementById('open-delete-modal');
+        var closeBtn = document.getElementById('delete-modal-close');
+        var cancelBtn = document.getElementById('delete-modal-cancel');
+
+        function openModal() { modal.classList.add('open'); }
+        function closeModal() { modal.classList.remove('open'); }
+
+        openBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
         // Click on the dark backdrop (but not inside the card) closes the pop-up.
         modal.addEventListener('click', function (e) {
             if (e.target === modal) closeModal();
