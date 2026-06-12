@@ -135,10 +135,23 @@ h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); margin: 2.4rem 0 1rem; }
     backdrop-filter: blur(20px) saturate(160%);
     box-shadow: 0 18px 50px -25px rgba(0, 0, 0, 0.85);
 }
-.navbar-brand { font-size: 1.3rem; letter-spacing: 0.12em; }
-.navbar-brand::before { content: "◉ "; color: var(--blue); }
-.navbar-brand a { transition: text-shadow 0.35s var(--ease); }
-.navbar-brand:hover a { text-shadow: 0 0 22px rgba(142, 162, 255, 0.8); }
+/* Same logo as the home hero: Space Grotesk, gradient text + soft glow, tight
+   lettering, no leading symbol — just scaled down to navbar size. */
+.navbar-brand {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.04em;
+    line-height: 1;
+}
+.navbar-brand a {
+    background: var(--grad-text);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 16px rgba(142, 162, 255, 0.4));
+    transition: filter 0.35s var(--ease);
+}
+.navbar-brand:hover a { filter: drop-shadow(0 0 26px rgba(142, 162, 255, 0.85)); }
 .navbar-links { gap: 1.6rem; }
 .navbar-links a {
     position: relative;
@@ -159,9 +172,15 @@ h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); margin: 2.4rem 0 1rem; }
 .navbar-links a.active:not(.navbar-user)::after { display: none; } /* override base block underline */
 .navbar-links a.active:not(.navbar-user) { color: var(--ink); }
 .navbar-links a.active:not(.navbar-user)::before { display: none; }
-.navbar-user {
+/* Selector mirrors `.navbar-links a` specificity so the horizontal padding
+   actually applies (a plain `.navbar-user` loses to it and the pill ends up
+   cramped). More breathing room around a name like "Noemi05", plus a little
+   separation from the neighbouring link. */
+.navbar-links a.navbar-user {
     background: var(--glass-2);
     border-color: var(--glass-brd);
+    padding: 0.42rem 1.2rem;
+    margin-left: 0.5rem;
     transition: box-shadow 0.3s var(--ease), border-color 0.3s var(--ease);
 }
 .navbar-user:hover { box-shadow: var(--glow); border-color: var(--blue); }
@@ -436,6 +455,137 @@ footer {
 @keyframes kenburns { from { transform: scale(1.02); } to { transform: scale(1.09); } }
 
 .detail-actions { display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; margin: 1.2rem 0; }
+
+/* ---- Immersive image page ----
+   A near-full-screen NASA photo at the top (full-bleed, object-cover) with the
+   title + date overlaid over a dark gradient veil, then a clean centred column
+   below for the description and actions. The image is a normal in-flow element:
+   it stays still and scrolls away — NO sticky / fixed / parallax / scroll
+   transforms, so it never follows the viewport. */
+.img-hero {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-top: -2.5rem;         /* sit up near the top, under the floating navbar */
+    height: 90vh;                /* leaves the section below just peeking through */
+    min-height: 460px;
+    overflow: hidden;
+    background: transparent;
+}
+.img-hero-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 96%);
+            mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 96%);
+}
+/* Flush variant (image.html only — Oggi/Sorprendimi/dettaglio): the photo runs
+   to the very top of the page with the floating navbar overlaid on it, exactly
+   like the home. Pull up by the main top-padding + the navbar's flow height;
+   a generous value so there's never a gap (the cover image just crops a hair
+   under the navbar, which is the desired overlap). */
+.img-hero--flush { margin-top: calc(-1 * var(--flush-pull, 7.5rem)); }
+/* Soft dark scrim at the very top, behind the navbar (z-index below it), so the
+   pill stays readable over bright parts of the image. */
+.img-hero-topveil {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 3;
+    height: 170px; pointer-events: none;
+    background: linear-gradient(to bottom, rgba(3,4,10,0.55) 0%, rgba(3,4,10,0.22) 48%, transparent 100%);
+}
+.img-hero-veil {
+    position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    /* Light, semi-transparent band only for title legibility — never a solid
+       colour, and transparent at the very bottom so it can't create a seam with
+       the description. The image itself dissolves via the photo's mask. */
+    background: linear-gradient(to bottom, transparent 50%, rgba(3,4,10,0.5) 86%, transparent 100%);
+}
+.img-hero-cap {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+    padding: 2.4rem clamp(1.2rem, 5vw, 4rem) 3.2rem;
+    max-width: min(960px, 92%);
+}
+.img-hero-title {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 5.5vw, 4rem);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    margin: 0.35rem 0 0.4rem;
+    color: var(--ink);
+    text-shadow: 0 6px 34px rgba(0,0,0,0.85);
+}
+.img-hero-date {
+    margin: 0;
+    color: var(--ink); opacity: 0.9;
+    font-family: "Spectral", serif; font-style: italic;
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    text-shadow: 0 2px 18px rgba(0,0,0,0.8);
+}
+
+/* Reading area below the image — full-bleed to the page width (breaks out of
+   the centred main column) with a comfortable, responsive side padding so the
+   description spans the whole width without touching the edges. */
+.img-body {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    box-sizing: border-box;
+    padding: 2.6rem clamp(1.5rem, 6vw, 5rem) 0;
+}
+.img-body .ov-explanation {
+    line-height: 1.8;
+    font-size: 1.05rem;
+    margin-top: 0;
+    /* Override the global 70ch cap so the description fills the full page width
+       (the .img-body padding keeps it off the edges). */
+    max-width: none;
+    width: 100%;
+}
+/* Keep the form controls at a comfortable width (the description above already
+   spans the full page) so inputs/textarea don't stretch awkwardly wide. */
+.img-body form { margin-top: 2.2rem; max-width: 720px; }
+.img-body-more { margin-top: 1.8rem; }
+
+/* Keep the scroll cue clear of the bottom-left caption (it's centred on the
+   home, but here the title/date live bottom-left). */
+.img-hero .scroll-cue { left: auto; right: clamp(1rem, 4vw, 2.4rem); transform: none; }
+
+@media (max-width: 760px) {
+    .img-hero { height: 78vh; margin-top: -2rem; }
+    /* Re-assert the flush pull (the line above would otherwise override it),
+       tuned for the taller mobile navbar + main padding. */
+    .img-hero--flush { margin-top: calc(-1 * var(--flush-pull-m, 7.5rem)); }
+    .img-hero-cap { padding: 1.8rem 1.2rem 2.8rem; }
+}
+
+/* ---- Custom cosmic file picker ----
+   The native input is visually hidden; a styled label is the button and the
+   chosen filename is shown elegantly (set via JS on change). */
+.file-picker { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap; }
+.file-input {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.file-label {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.6rem 1.15rem; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--glass-brd); background: var(--glass-2); color: var(--ink);
+    font-weight: 600; font-size: 0.9rem;
+    transition: transform 0.2s var(--ease), box-shadow 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+.file-label:hover { transform: translateY(-2px); box-shadow: var(--glow); border-color: var(--blue); }
+.file-input:focus-visible + .file-label { outline: 2px solid var(--blue); outline-offset: 2px; }
+.file-name {
+    color: var(--ink-dim); font-size: 0.86rem;
+    font-family: "Spectral", serif; font-style: italic;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px;
+}
+.file-name.has-file { color: var(--ink); }
+@media (prefers-reduced-motion: reduce) {
+    .file-label { transition: none; }
+    .file-label:hover { transform: none; }
+}
 
 /* =====================================================================
    ATLAS

@@ -3,45 +3,58 @@
 {% block title %}Overview · {{ heading }}{% endblock %}
 
 {% block content %}
-<div class="page-head" data-reveal>
-    <p class="ov-eyebrow">{{ heading }}</p>
-</div>
-
 {% if image %}
-<article data-reveal>
     {% if image.image_url %}
-        <figure class="shot">
-            <img src="{{ image.image_url }}" alt="{{ image.title }}" class="ov-image--hero">
-            <span class="shot-veil"></span>
-            <figcaption class="shot-cap">
-                <h1>{{ image.title }}</h1>
-                <p class="meta">{{ image.pretty_date }}{% if image.copyright %} · © {{ image.copyright }}{% endif %}</p>
-            </figcaption>
-        </figure>
+    <section class="img-hero img-hero--flush">
+        <img src="{{ image.image_url }}" alt="{{ image.title }}" class="img-hero-photo">
+        <div class="img-hero-topveil"></div>
+        <div class="img-hero-veil"></div>
+        <div class="img-hero-cap">
+            <p class="ov-eyebrow">{{ heading }}</p>
+            <h1 class="img-hero-title">{{ image.title }}</h1>
+            <p class="img-hero-date">{{ image.pretty_date }}{% if image.copyright %} · © {{ image.copyright }}{% endif %}</p>
+        </div>
+        <a href="#dettagli" class="scroll-cue" aria-label="Scorri giù">
+            <span class="mouse"></span>
+            <span>scorri</span>
+        </a>
+    </section>
     {% else %}
+    <div class="page-head" data-reveal>
+        <p class="ov-eyebrow">{{ heading }}</p>
         <h1>{{ image.title }}</h1>
         <p class="muted">{{ image.pretty_date }}{% if image.copyright %} · © {{ image.copyright }}{% endif %}</p>
+    </div>
     {% endif %}
 
-    {% if current_user %}
-    <form method="POST" action="{{ url_for('save_image') }}" enctype="multipart/form-data" class="detail-save" style="margin-top:1rem;">
-        <input type="hidden" name="title" value="{{ image.title }}">
-        <input type="hidden" name="date" value="{{ image.date }}">
-        <input type="hidden" name="image_url" value="{{ image.image_url }}">
-        <input type="hidden" name="explanation" value="{{ image.explanation }}">
-        <div class="form-field" style="max-width:460px;">
-            <label for="image-personal">Allega una tua foto, un ricordo di quel giorno (opzionale)</label>
-            <input type="file" id="image-personal" name="personal_image" accept="image/*" class="input-field">
-        </div>
-        <button type="submit" class="btn btn-primary">♡ Aggiungi al mio atlante</button>
-    </form>
-    {% endif %}
+    <section id="dettagli" class="img-body" data-reveal>
+        <p class="ov-explanation">{{ image.explanation }}</p>
 
-    <p class="ov-explanation">{{ image.explanation }}</p>
-</article>
+        {% if current_user %}
+        <form method="POST" action="{{ url_for('save_image') }}" enctype="multipart/form-data" class="detail-save">
+            <input type="hidden" name="title" value="{{ image.title }}">
+            <input type="hidden" name="date" value="{{ image.date }}">
+            <input type="hidden" name="image_url" value="{{ image.image_url }}">
+            <input type="hidden" name="explanation" value="{{ image.explanation }}">
+            <div class="form-field">
+                <label for="image-personal">Allega una tua foto, un ricordo di quel giorno (opzionale)</label>
+                <div class="file-picker">
+                    <input type="file" id="image-personal" name="personal_image" accept="image/*" class="file-input" data-file-input>
+                    <label for="image-personal" class="file-label">＋ Carica una foto</label>
+                    <span class="file-name" data-file-name>Nessun file selezionato</span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">♡ Aggiungi al mio atlante</button>
+        </form>
+        {% endif %}
+
+        <p class="img-body-more"><a href="/surprise" class="btn btn-ghost">Mostrami un'altra →</a></p>
+    </section>
 {% else %}
+    <div class="page-head" data-reveal>
+        <p class="ov-eyebrow">{{ heading }}</p>
+    </div>
     <p class="muted">Non riesco a caricare l'immagine adesso. Riprova tra poco.</p>
+    <p style="margin-top:1.8rem;"><a href="/surprise" class="btn btn-ghost">Mostrami un'altra →</a></p>
 {% endif %}
-
-<p style="margin-top:1.8rem;"><a href="/surprise" class="btn btn-ghost">Mostrami un'altra →</a></p>
 {% endblock %}

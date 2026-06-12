@@ -133,7 +133,11 @@
             </div>
             <div class="form-field">
                 <label for="modal-personal-file" id="modal-personal-label">Allega una tua foto, un ricordo di quel giorno</label>
-                <input type="file" id="modal-personal-file" name="personal_image" accept="image/*" class="input-field">
+                <div class="file-picker">
+                    <input type="file" id="modal-personal-file" name="personal_image" accept="image/*" class="file-input" data-file-input>
+                    <label for="modal-personal-file" class="file-label">＋ Carica una foto</label>
+                    <span class="file-name" data-file-name>Nessun file selezionato</span>
+                </div>
                 <label class="modal-remove" id="modal-remove-wrap" hidden>
                     <input type="checkbox" name="remove_personal" value="1">
                     <span>Rimuovi il ricordo attuale</span>
@@ -177,6 +181,8 @@
             // Personal photo: show it next to the universe shot if one exists.
             var personal = card.dataset.personal || '';
             personalFile.value = '';
+            // Let the custom file picker reset its displayed filename too.
+            personalFile.dispatchEvent(new Event('change'));
             removeCheckbox.checked = false;
             if (personal) {
                 personalImg.src = personal;

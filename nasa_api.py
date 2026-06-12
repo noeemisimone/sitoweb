@@ -80,6 +80,23 @@ APOD_ENDPOINT = "https://api.nasa.gov/planetary/apod"
 
 ARCHIVE_START = "1995-06-16"  # the very first APOD
 
+# Italian month names, so dates read "04 luglio 2005" instead of the system
+# locale's English "04 July 2005". Used only for display formatting.
+_MONTHS_IT = [
+    "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+    "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre",
+]
+
+
+def _format_date_it(raw_date):
+    """Format 'YYYY-MM-DD' as '04 luglio 2005'. Returns the input unchanged
+    if it can't be parsed, so a missing/odd date never breaks the page."""
+    try:
+        d = datetime.strptime(raw_date, "%Y-%m-%d")
+        return f"{d.day:02d} {_MONTHS_IT[d.month - 1]} {d.year}"
+    except (TypeError, ValueError):
+        return raw_date
+
 
 def _request(params):
     """Low-level call. Retries a few times on transient network hiccups
@@ -146,11 +163,7 @@ def format_apod(data):
         display_url = data.get("thumbnail_url") or data.get("url")
 
     raw_date = data.get("date")
-    pretty_date = raw_date
-    try:
-        pretty_date = datetime.strptime(raw_date, "%Y-%m-%d").strftime("%d %B %Y")
-    except (TypeError, ValueError):
-        pass
+    pretty_date = _format_date_it(raw_date)
 
     return {
         "title": _translate(data.get("title", "Untitled")),

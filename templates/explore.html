@@ -46,35 +46,43 @@
 </div>
 
 {% if image %}
-<article data-reveal style="margin-top:3.5rem;">
     {% if image.image_url %}
-        <figure class="shot">
-            <img src="{{ image.image_url }}" alt="{{ image.title }}" class="ov-image--hero">
-            <span class="shot-veil"></span>
-            <figcaption class="shot-cap">
-                <h1>{{ image.title }}</h1>
-                <p class="meta">{{ image.pretty_date }}{% if image.copyright %} · © {{ image.copyright }}{% endif %}</p>
-            </figcaption>
-        </figure>
+    <section class="img-hero" style="margin-top:3.5rem;">
+        <img src="{{ image.image_url }}" alt="{{ image.title }}" class="img-hero-photo">
+        <div class="img-hero-veil"></div>
+        <div class="img-hero-cap">
+            <h1 class="img-hero-title">{{ image.title }}</h1>
+            <p class="img-hero-date">{{ image.pretty_date }}{% if image.copyright %} · © {{ image.copyright }}{% endif %}</p>
+        </div>
+        <a href="#dettagli" class="scroll-cue" aria-label="Scorri giù">
+            <span class="mouse"></span>
+            <span>scorri</span>
+        </a>
+    </section>
     {% endif %}
 
-    <form method="POST" action="{{ url_for('save_image') }}" enctype="multipart/form-data" style="margin-top:1.2rem;">
-        <input type="hidden" name="title" value="{{ image.title }}">
-        <input type="hidden" name="date" value="{{ image.date }}">
-        <input type="hidden" name="image_url" value="{{ image.image_url }}">
-        <input type="hidden" name="explanation" value="{{ image.explanation }}">
-        <div class="form-field">
-            <label for="nota">La tua nota (perché ti colpisce)</label>
-            <textarea id="nota" name="nota" class="input-field" placeholder="Scrivi un pensiero su questa immagine…"></textarea>
-        </div>
-        <div class="form-field">
-            <label for="explore-personal">Allega una tua foto, un ricordo di quel giorno (opzionale)</label>
-            <input type="file" id="explore-personal" name="personal_image" accept="image/*" class="input-field">
-        </div>
-        <button type="submit" class="btn btn-primary">♡ Aggiungi al mio atlante</button>
-    </form>
+    <section id="dettagli" class="img-body" data-reveal>
+        <p class="ov-explanation">{{ image.explanation }}</p>
 
-    <p class="ov-explanation">{{ image.explanation }}</p>
-</article>
+        <form method="POST" action="{{ url_for('save_image') }}" enctype="multipart/form-data">
+            <input type="hidden" name="title" value="{{ image.title }}">
+            <input type="hidden" name="date" value="{{ image.date }}">
+            <input type="hidden" name="image_url" value="{{ image.image_url }}">
+            <input type="hidden" name="explanation" value="{{ image.explanation }}">
+            <div class="form-field">
+                <label for="nota">La tua nota (perché ti colpisce)</label>
+                <textarea id="nota" name="nota" class="input-field" placeholder="Scrivi un pensiero su questa immagine…"></textarea>
+            </div>
+            <div class="form-field">
+                <label for="explore-personal">Allega una tua foto, un ricordo di quel giorno (opzionale)</label>
+                <div class="file-picker">
+                    <input type="file" id="explore-personal" name="personal_image" accept="image/*" class="file-input" data-file-input>
+                    <label for="explore-personal" class="file-label">＋ Carica una foto</label>
+                    <span class="file-name" data-file-name>Nessun file selezionato</span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">♡ Aggiungi al mio atlante</button>
+        </form>
+    </section>
 {% endif %}
 {% endblock %}

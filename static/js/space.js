@@ -104,7 +104,7 @@
         if (!c || !c.getContext) return;
         var ctx = c.getContext('2d');
         var w, h, cx, cy, parts = [], stars = [], ang = 0, raf = null, alive = false;
-        var ARMS = 4, TWIST = 3.3;
+        var ARMS = 4, TWIST = 3.6;
 
         function size() {
             var rect = c.getBoundingClientRect();
@@ -121,17 +121,21 @@
                 var radius = tt * maxR;
                 var arm = Math.floor(Math.random() * ARMS);
                 var spiral = (arm / ARMS) * 6.2832 + (radius / maxR) * TWIST * Math.PI;
-                var scatter = (1 - tt) * 0.18 + 0.05;
+                // Tighter scatter packs the stars closer to each arm's ridge, so
+                // the spiral arms read as crisp, defined lanes rather than a haze.
+                var scatter = (1 - tt) * 0.11 + 0.03;
                 var theta = spiral + (Math.random() - 0.5) * scatter * Math.PI;
                 var core = 1 - tt;
                 parts.push({
                     r: radius, theta: theta,
                     size: (Math.random() * 1.1 + 0.4) * DPR * (0.6 + core),
-                    alpha: 0.35 + Math.random() * 0.5,
+                    alpha: 0.42 + Math.random() * 0.5,
                     rr: Math.round(ACCENT[0] + (255 - ACCENT[0]) * core),
                     gg: Math.round(ACCENT[1] + (255 - ACCENT[1]) * core),
                     bb: Math.round(ACCENT[2] + (255 - ACCENT[2]) * core),
-                    speed: 0.12 + core * 0.26
+                    // Higher floor so even the outer arms visibly sweep round;
+                    // the centre still turns faster (differential rotation).
+                    speed: 0.18 + core * 0.24
                 });
             }
             var s = Math.min(160, Math.floor((w * h) / (11000 * DPR)));
@@ -169,7 +173,9 @@
                 ctx.fill();
             }
             ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
-            if (animate) { ang += 0.0016; raf = requestAnimationFrame(function () { frame(true); }); }
+            // Faster than before so the rotation is clearly visible, yet slow
+            // enough to stay smooth and elegant.
+            if (animate) { ang += 0.007; raf = requestAnimationFrame(function () { frame(true); }); }
         }
         function start() { if (alive || reduce) return; alive = true; frame(true); }
         function stop() { alive = false; if (raf) cancelAnimationFrame(raf); raf = null; }
