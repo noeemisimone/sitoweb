@@ -104,10 +104,16 @@ def _request(params):
     params = {"api_key": API_KEY, "thumbs": True, **params}
     for attempt in range(3):
         try:
-            response = requests.get(APOD_ENDPOINT, params=params, timeout=15)
+            response = requests.get(APOD_ENDPOINT, params=params, timeout=5)
             response.raise_for_status()
             return response.json()
-        except requests.exceptions.RequestException:
+        # Network/HTTP failures: connection down, request timed out, or a non-2xx
+        # status (raised by raise_for_status). RequestException is their common
+        # base and also covers any other transient request error.
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout,
+                requests.exceptions.HTTPError,
+                requests.exceptions.RequestException):
             continue
     return None
 
