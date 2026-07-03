@@ -3,7 +3,7 @@ import uuid
 from datetime import date, datetime
 from functools import wraps
 
-from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask import Flask, flash, make_response, redirect, render_template, request, session, url_for
 from sqlalchemy import func, inspect, text
 
 from config import config_map
@@ -589,6 +589,36 @@ def delete_account():
     return redirect(url_for("index"))
 
 
+@app.route("/cookie_consent", methods=["POST"])
+def cookie_consent():
+    """Record the GDPR cookie choice. Works for guests and logged-in users:
+    the choice is always stored in a browser cookie, and additionally saved on
+    the account when someone is logged in, so the banner never shows again."""
+    accepted = request.form.get("choice") == "accept"
+
+    # Persist on the account when logged in (None -> True/False hides the banner).
+    if "user_id" in session:
+        user = User.query.get(session["user_id"])
+        if user is not None:
+            user.cookie_consent = accepted
+            try:
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
+
+    resp = make_response(redirect(request.referrer or url_for("index")))
+    resp.set_cookie(
+        "cookie_consent",
+        "accepted" if accepted else "refused",
+        max_age=60 * 60 * 24 * 365,   # 1 year
+        httponly=True,
+        samesite="Lax",
+        # HTTPS-only in production (Render), off for local http dev.
+        secure=not app.debug,
+    )
+    return resp
+
+
 # ---------------------------------------------------------------------------
 # Error handlers
 # ---------------------------------------------------------------------------
@@ -629,6 +659,9 @@ def _ensure_schema():
         user_cols = [c["name"] for c in inspector.get_columns("user")]
         if "birthdate" not in user_cols:
             conn.execute(text("ALTER TABLE user ADD COLUMN birthdate VARCHAR(20)"))
+            conn.commit()
+        if "cookie_consent" not in user_cols:
+            conn.execute(text("ALTER TABLE \"user\" ADD COLUMN cookie_consent BOOLEAN"))
             conn.commit()
 
 

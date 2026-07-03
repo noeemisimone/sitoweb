@@ -16,6 +16,9 @@ class User(db.Model):
     # before this feature stay valid; used to set their birthday's APOD as the
     # profile background.
     birthdate = db.Column(db.String(20))
+    # GDPR cookie choice: None = not decided yet (show the banner), True =
+    # accepted, False = refused. Nullable so existing accounts keep working.
+    cookie_consent = db.Column(db.Boolean, nullable=True, default=None)
 
     # Was "cities" — now the images this user has collected into their atlas.
     saved_images = db.relationship("SavedImage", backref="user", lazy=True)

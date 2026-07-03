@@ -335,6 +335,190 @@ footer {
 .footer-brand { font-size: 1.4rem; letter-spacing: 0.1em; }
 .footer-brand::before { content: "◉ "; color: var(--blue); }
 
+/* ---------- GDPR cookie banner: a capsule opens a slim bottom bar ----------
+   A luminous capsule descends from above and opens into a thin, full-width
+   consent bar pinned to the bottom edge — a single horizontal row (text left,
+   buttons + link right) that never covers the hero title/CTA. Cosmic but sober:
+   translucent glass with a faint luminous top edge. The consent form/route/
+   values are unchanged — presentation only. No-JS and reduced-motion show the
+   bar static (no capsule). */
+.cookie-stage {
+    position: fixed;
+    inset: 0;
+    z-index: 9990;
+    overflow: hidden;
+    pointer-events: none;   /* page stays usable; only the bar takes pointers */
+}
+
+/* The luminous capsule that descends from the top and opens the bar. */
+.cookie-capsule {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: none;          /* only during the cinematic */
+    transform: translate(-50%, -12vh) scale(0.3);
+    background: radial-gradient(circle at 40% 38%, #ffffff, #aebfff 55%, #b98cff);
+    box-shadow: 0 0 16px 5px rgba(142, 162, 255, 0.85), 0 0 36px 10px rgba(185, 140, 255, 0.4);
+}
+
+/* ----- The capsule bar: a rounded pill floating above the bottom edge ----- */
+.cookie-pod {
+    position: fixed;
+    left: 50%;
+    bottom: 1.2rem;
+    transform: translateX(-50%);
+    transform-origin: center;   /* pivot for the scaleX open/close */
+    width: auto;
+    max-width: min(960px, calc(100% - 2rem));
+    pointer-events: auto;   /* the only interactive part of the stage */
+    padding: 1rem 1.8rem;
+    border-radius: 999px;
+    border: 1px solid rgba(142, 162, 255, 0.28);
+    background: rgba(9, 11, 24, 0.82);
+    -webkit-backdrop-filter: blur(22px) saturate(155%);
+    backdrop-filter: blur(22px) saturate(155%);
+    /* Sober glow all around the pill. */
+    box-shadow:
+        0 18px 50px -24px rgba(0, 0, 0, 0.85),
+        0 0 0 1px rgba(142, 162, 255, 0.06),
+        0 0 50px -16px rgba(142, 162, 255, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+/* Hidden until JS decides how to reveal it (avoids a flash before scripting). */
+.js .cookie-pod { opacity: 0; }
+/* Soft bloom of light around the capsule as it opens. */
+.cookie-pod-glow {
+    position: absolute;
+    inset: -40%;
+    border-radius: 999px;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(circle, rgba(180, 200, 255, 0.42), rgba(185, 140, 255, 0.15) 46%, transparent 72%);
+}
+
+/* Inner row: text left, controls right, centred to a comfortable width. */
+.cookie-bar-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1160px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.4rem;
+}
+.cookie-msg {
+    margin: 0;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    color: var(--ink-dim);
+}
+.cookie-controls {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.cookie-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin: 0;
+}
+.cookie-actions .btn { padding: 0.55rem 1.25rem; font-size: 0.9rem; }
+/* "Autorizza": richer accent glow than the default primary button. */
+.cookie-actions .btn-primary {
+    box-shadow: 0 8px 26px -10px rgba(142, 162, 255, 0.8), 0 0 18px -4px rgba(185, 140, 255, 0.5);
+}
+.cookie-actions .btn-primary:hover {
+    box-shadow: 0 12px 36px -10px rgba(142, 162, 255, 0.95), 0 0 26px -2px rgba(185, 140, 255, 0.65);
+}
+.cookie-actions .btn:hover::before { left: 150%; }   /* quick light pass on hover */
+.cookie-link {
+    flex: 0 0 auto;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--ink-dim);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 0.25s ease, border-color 0.25s ease;
+}
+.cookie-link:hover { color: var(--blue); border-bottom-color: rgba(142, 162, 255, 0.6); }
+
+/* ----- Static reveal (no-JS / reduced-motion / repeat-in-session) ----- */
+.cookie-stage.is-static .cookie-pod { opacity: 1; animation: none; }
+
+/* ----- The cinematic: capsule descends, the bar slides up / blooms open ----- */
+.cookie-stage.is-playing .cookie-capsule {
+    display: block;
+    animation: capsule-drop 1.1s var(--ease) 0.2s both;
+}
+.cookie-stage.is-playing .cookie-pod {
+    animation: bar-open 0.55s var(--ease) 1.15s both;
+}
+.cookie-stage.is-playing .cookie-bar-inner {
+    animation: pod-content 0.5s ease 1.65s both;
+}
+.cookie-stage.is-playing .cookie-pod-glow {
+    animation: pod-flash 0.9s ease 1.1s both;
+}
+
+/* ----- Exit on choice: the bar slides back down ----- */
+.cookie-stage.is-leaving .cookie-pod {
+    animation: bar-close 0.5s var(--ease) forwards !important;
+}
+
+@keyframes capsule-drop {
+    0%   { opacity: 0; transform: translate(-50%, -12vh) scale(0.3); }
+    18%  { opacity: 1; transform: translate(-50%, -8vh)  scale(1); }
+    100% { opacity: 0; transform: translate(-50%, calc(100vh - 52px)) scale(0.5); }
+}
+/* The capsule unrolls from a thin luminous line at the centre outwards. */
+@keyframes bar-open {
+    0%   { opacity: 0; transform: translateX(-50%) scaleX(0.02); }
+    18%  { opacity: 1; }
+    100% { opacity: 1; transform: translateX(-50%) scaleX(1); }
+}
+/* On choice it closes back to the centre and vanishes. */
+@keyframes bar-close {
+    from { opacity: 1; transform: translateX(-50%) scaleX(1); }
+    to   { opacity: 0; transform: translateX(-50%) scaleX(0.02); }
+}
+@keyframes pod-content {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+@keyframes pod-flash {
+    0%   { opacity: 0; transform: scale(0.5); }
+    45%  { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.15); }
+}
+
+/* Mobile: text above, buttons below — still a compact bar pinned to the bottom. */
+@media (max-width: 640px) {
+    .cookie-pod {
+        max-width: calc(100% - 1.5rem);
+        bottom: 0.9rem;
+        border-radius: 26px;   /* a rounded floating card (full pill reads odd when stacked) */
+        padding: 1rem 1.3rem calc(1rem + env(safe-area-inset-bottom));
+    }
+    .cookie-bar-inner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.7rem;
+        text-align: center;
+    }
+    .cookie-controls { justify-content: center; }
+    .cookie-stage.is-playing .cookie-capsule { animation-delay: 0.15s; }
+    .cookie-stage.is-playing .cookie-pod { animation-delay: 1s; }
+    .cookie-stage.is-playing .cookie-bar-inner { animation-delay: 1.5s; }
+    .cookie-stage.is-playing .cookie-pod-glow { animation-delay: 0.95s; }
+}
+
 /* =====================================================================
    HOME — galaxy hero
    ===================================================================== */
@@ -581,7 +765,41 @@ footer {
 /* Keep the form controls at a comfortable width (the description above already
    spans the full page) so inputs/textarea don't stretch awkwardly wide. */
 .img-body form { margin-top: 2.2rem; max-width: 720px; }
-.img-body-more { margin-top: 1.8rem; }
+
+/* Save block: the primary action leads; the photo is a light, optional
+   progressive-disclosure link beneath it. */
+.detail-save-btn { font-size: 1.02rem; padding: 0.85rem 1.7rem; }
+.detail-photo { margin-top: 0.9rem; }
+.detail-photo-toggle {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.85rem;
+    color: var(--ink-dim);
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+.detail-photo-toggle:hover { color: var(--blue); border-bottom-color: rgba(142, 162, 255, 0.5); }
+.detail-photo-toggle .opt { opacity: 0.6; font-family: "Spectral", serif; font-style: italic; }
+/* The filename only appears once a file has actually been chosen. */
+.detail-photo .file-name { display: none; }
+.detail-photo .file-name.has-file { display: inline; }
+
+/* "Show another": a clearly tertiary link, set apart by a divider. */
+.img-body-more {
+    max-width: 720px;
+    margin-top: 2.4rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+}
+.detail-next {
+    color: var(--ink-dim);
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+.detail-next:hover { color: var(--ink); }
 
 /* Keep the scroll cue clear of the bottom-left caption (it's centred on the
    home, but here the title/date live bottom-left). */
@@ -748,6 +966,13 @@ footer {
     .shot .ov-image--hero { animation: none; }
     .scroll-cue .mouse::before { animation: none; }
     .hero-title { animation: none; }
+    /* Cookie bar: no capsule, no scene — show the static bottom bar directly. */
+    .cookie-capsule { display: none !important; }
+    .cookie-pod, .cookie-bar-inner, .cookie-pod-glow {
+        animation: none !important;
+    }
+    .cookie-pod { opacity: 1 !important; transform: translateX(-50%) !important; }
+    .cookie-pod-glow { opacity: 0 !important; }
     .btn::before, .auth-submit::before { display: none; }
     .js [data-reveal], .js [data-reveal="grid"] > * {
         opacity: 1 !important; transform: none !important; transition: none !important;

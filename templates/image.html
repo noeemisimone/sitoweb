@@ -36,19 +36,18 @@
             <input type="hidden" name="date" value="{{ image.date }}">
             <input type="hidden" name="image_url" value="{{ image.image_url }}">
             <input type="hidden" name="explanation" value="{{ image.explanation }}">
-            <div class="form-field">
-                <label for="image-personal">Allega una tua foto, un ricordo di quel giorno (opzionale)</label>
-                <div class="file-picker">
-                    <input type="file" id="image-personal" name="personal_image" accept="image/*" class="file-input" data-file-input>
-                    <label for="image-personal" class="file-label">＋ Carica una foto</label>
-                    <span class="file-name" data-file-name>Nessun file selezionato</span>
-                </div>
+
+            <button type="submit" class="btn btn-primary detail-save-btn">♡ Aggiungi al mio atlante</button>
+
+            <div class="detail-photo file-picker">
+                <input type="file" id="image-personal" name="personal_image" accept="image/*" class="file-input" data-file-input>
+                <label for="image-personal" class="detail-photo-toggle">＋ Allega una foto ricordo <span class="opt">(opzionale)</span></label>
+                <span class="file-name" data-file-name>Nessun file selezionato</span>
             </div>
-            <button type="submit" class="btn btn-primary">♡ Aggiungi al mio atlante</button>
         </form>
         {% endif %}
 
-        <p class="img-body-more"><a href="/surprise" class="btn btn-ghost">Mostrami un'altra →</a></p>
+        <p class="img-body-more"><a href="/surprise" class="detail-next">Mostrami un'altra →</a></p>
     </section>
 {% else %}
     <div class="page-head" data-reveal>

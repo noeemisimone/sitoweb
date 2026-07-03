@@ -109,3 +109,80 @@
         });
     });
 })();
+
+// ---- Cookie banner: "a probe delivers the cookie" event ----
+// Orchestrates the cinematic (probe flies across, drops the capsule, the pod
+// blooms open) and the exit when a choice is made. Pure presentation: the
+// consent form, its button values and the /cookie_consent route are untouched.
+// No-JS and reduced-motion fall back to a static, immediately-usable pod.
+(function initCookiePod() {
+    var stage = document.querySelector('.cookie-stage');
+    if (!stage) return;
+
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var pod = stage.querySelector('.cookie-pod');
+    var form = stage.querySelector('.cookie-actions');
+
+    // Decide how to reveal the pod.
+    if (reduce) {
+        stage.classList.add('is-static');
+    } else {
+        var seen = false;
+        try { seen = sessionStorage.getItem('ov_cookie_ship') === '1'; } catch (e) {}
+        if (seen) {
+            // Already saw the probe this session — just show the pod.
+            stage.classList.add('is-static');
+        } else {
+            try { sessionStorage.setItem('ov_cookie_ship', '1'); } catch (e) {}
+            // The full-screen cosmic loader (z-index 9999) sits ABOVE the banner
+            // (9990) during load. If we start the open now it plays hidden behind
+            // it and is already open by the time the loader fades — so wait until
+            // the loader is gone, then play the capsule cinematic in full view.
+            var loader = document.getElementById('cosmicLoader');
+            var started = false;
+            function play() {
+                if (started) return;
+                started = true;
+                stage.classList.add('is-playing');
+            }
+            var loaderVisible = loader &&
+                !loader.classList.contains('is-hidden') &&
+                getComputedStyle(loader).display !== 'none';
+            if (loaderVisible) {
+                loader.addEventListener('transitionend', function (e) {
+                    if (e.propertyName === 'opacity' && loader.classList.contains('is-hidden')) play();
+                });
+                // Fallbacks in case the fade transition never reports.
+                window.addEventListener('load', function () { setTimeout(play, 1800); });
+                setTimeout(play, 6000);
+            } else {
+                play();
+            }
+        }
+    }
+
+    // Exit animation on choice (only when motion is allowed). Without JS, or in
+    // reduced-motion, the buttons submit natively with their own name/value.
+    if (!reduce && form) {
+        form.addEventListener('click', function (e) {
+            var btn = e.target.closest('button[name="choice"]');
+            if (!btn) return;
+            e.preventDefault();
+            if (stage.classList.contains('is-leaving')) return;
+
+            // Carry the chosen value through a programmatic submit (form.submit()
+            // would otherwise drop the clicked button's name/value).
+            var hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = 'choice';
+            hidden.value = btn.value;
+            form.appendChild(hidden);
+
+            stage.classList.add('is-leaving');
+            var done = false;
+            function go() { if (done) return; done = true; form.submit(); }
+            pod.addEventListener('animationend', go, { once: true });
+            setTimeout(go, 700); // fallback if animationend doesn't fire
+        });
+    }
+})();

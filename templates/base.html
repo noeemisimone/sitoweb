@@ -74,6 +74,32 @@
         </div>
     </footer>
 
+    {# GDPR cookie banner — shown only until a choice is made: for logged-in
+       users when cookie_consent is still None, for guests when the browser
+       cookie is absent. A floating cosmic panel, not a blocking modal. #}
+    {% if (current_user and current_user.cookie_consent is none) or (not current_user and not request.cookies.get('cookie_consent')) %}
+    <div class="cookie-stage" role="region" aria-label="Preferenze cookie">
+        {# A luminous capsule descends from above and opens into the consent bar.
+           Decorative; hidden for reduced-motion / no-JS, where the bar shows
+           static immediately. #}
+        <span class="cookie-capsule" aria-hidden="true"></span>
+
+        <div class="cookie-pod">
+            <span class="cookie-pod-glow" aria-hidden="true"></span>
+            <div class="cookie-bar-inner">
+                <p class="cookie-msg">Overview usa i cookie per ricordare le tue scelte e migliorarti l'esperienza.</p>
+                <div class="cookie-controls">
+                    <form method="POST" action="{{ url_for('cookie_consent') }}" class="cookie-actions">
+                        <button type="submit" name="choice" value="accept" class="btn btn-primary">Autorizza</button>
+                        <button type="submit" name="choice" value="refuse" class="btn btn-ghost">Rifiuta</button>
+                    </form>
+                    <a href="#trattamento-dati" class="cookie-link">Trattamento dati</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script src="{{ url_for('static', filename='js/space.js') }}"></script>
 </body>

@@ -256,7 +256,9 @@ footer { border-top: 1px solid var(--border); margin-top: 2rem; padding: 3rem 2r
 .modal-photos { display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: start; }
 .modal-photos.has-personal { grid-template-columns: 1fr 1fr; }
 .modal-photo { margin: 0; }
-.modal-photo img { width: 100%; max-height: 46vh; object-fit: contain; background: var(--bg-soft); }
+/* Fill the frame edge-to-edge (cover): no empty side bands. Crops a little at
+   the edges. A fixed height gives cover a box to fill. */
+.modal-photo img { width: 100%; height: 46vh; object-fit: cover; background: var(--bg-soft); }
 /* With two photos, force both into identical boxes so they match exactly.
    object-fit: cover fills the whole box (cropping a little) so a square
    NASA shot and a landscape personal photo become the same rectangle. */
